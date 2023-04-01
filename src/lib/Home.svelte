@@ -5,16 +5,17 @@
   import Bar from "./Bar.svelte";
   import Mymap from "./Mymap.svelte";
   import Finder from "./Finder.svelte";
-  import { mainObj } from "../store.js";
+  import { mainObj, openMap } from "../store.js";
 
-  let currentActive = 124;
+  let currentActive = "124";
   let userNav;
-  mainObj.current = currentActive;
+  let openIDs = [];
 
   //set nav bsr
   let setTitle = (txt, user_con) => {
     mainObj.setTitle(txt, user_con);
   };
+
   let DescrMessage;
   let setTitleMessage = (txt, user_con) => {
     DescrMessage = txt;
@@ -22,9 +23,62 @@
     if (user_con) userNav.appendChild(user_con);
   };
 
-  var myModal;
+  let getForm = (id, link1, params) => {
+    let control = id != 2 ? Finder : Mymap;
+    let SQLParams = null;
+    return {
+      Conrol: control,
+      Params: params,
+      SQLParams: SQLParams,
+    };
+  };
+
+  mainObj.open = (id, link1, params, cash = true) => {
+    if (!openMap.get(id)) {
+      let c = getForm(id, link1, params);
+      let obj = {
+        Control: c.Conrol,
+        Params: c.Params,
+        SQLParams: c.SQLParams,
+        data: {},
+      };
+      openMap.set(id, obj);
+      if (cash)
+        openIDs.push(id);
+    } else if (openMap.get(id).activate) openMap.get(id).activate();
+
+    currentActive = id;
+    mainObj.current = id;
+    openIDs = openIDs;
+    //25.05.2022 история по якорям
+    window.location.hash = id;
+  };
+
+  mainObj.open(currentActive, "", "132");
+
+  //история переходов
+  window.addEventListener(
+    "popstate",
+    function () {
+      let hi = window.location.hash.replace("#", "");
+      if (hi != mainObj.current && openMap.get(hi)) {
+        /*
+        if (openMap.get(hi).activate) openMap.get(hi).activate();
+        currentActive = hi;
+        mainObj.current = hi;
+        openIDs = openIDs;
+        */
+       
+        mainObj.open(hi);
+      }
+    },
+    false
+  );
+
+  let myModal;
   //var modalid = 'staticBackdrop';
   let staticBackdrop;
+
   onMount(() => {
     /*
 		myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
@@ -36,33 +90,6 @@
     mainObj.message = (msg) => {
       myModal.show(msg);
     };
-
-    mainObj.open = (id, link1, params) => {
-      /*
-      if (link1 == 'Bureau.Finder')
-        Control = Finder
-      if (link1 == 'Map')  
-        Control = Mymap
-      IdDeclare = params  
-      */
-      currentActive = id;
-      mainObj.current = currentActive;
-      //25.05.2022 история по якорям
-      window.location.hash = currentActive;
-    };
-    //история переходов
-    window.addEventListener(
-      "popstate",
-      function () {
-        let hi = window.location.hash.replace("#", "");
-        if (hi != mainObj.current) {
-          mainObj.current = hi;
-          currentActive = hi;
-        }
-      },
-      false
-    );
-    window.location.hash = currentActive;
   });
 </script>
 
@@ -114,25 +141,28 @@
   <!--<svelte:component this={Control} IdDeclare = {IdDeclare}/>-->
   <!--<Finder IdDeclare = {IdDeclare}/>-->
 
-  <!--
-<div class="container-fluid" hidden={currentActive!=1}>
-<Hdrs/>
-</div>
-<div class="container-fluid" hidden={currentActive!=2}>
-<Mymap/>
-</div>
--->
-
-  {#if currentActive == 2}
-    <Mymap {setTitle} />
+  {#each openIDs as e}
+    <div hidden={e != currentActive}>
+      <svelte:component
+        this={openMap.get(e).Control}
+        IdDeclare={openMap.get(e).Params}
+        {setTitle}
+        id={e.toString()}
+      />
+    </div>
+  {/each}
+  
+  {#if currentActive == "2"}
+    <Mymap id="2" {setTitle} />
   {/if}
-
+  {#if currentActive == "121"}
+    <Finder id="121" IdDeclare="129" setTitle={setTitle}/>
+  {/if}
+  <!--
   {#if currentActive == 124}
     <Finder IdDeclare="132" {setTitle} />
   {/if}
-  {#if currentActive == 121}
-    <Finder IdDeclare="129" />
-  {/if}
+  
   {#if currentActive == 122}
     <Finder IdDeclare="130" />
   {/if}
@@ -145,4 +175,5 @@
   {#if currentActive == 32}
     <Finder IdDeclare="121" />
   {/if}
+  -->
 </div>

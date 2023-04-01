@@ -1,9 +1,10 @@
 <script>
   import { onMount } from "svelte";
-  import { mainObj } from "../store.js";
+  import { mainObj, openMap } from "../store.js";
   export let IdDeclare;
   export let setTitle;
   export let hih;
+  export let id;
 
   let load = true;
   let mid = {};
@@ -13,17 +14,26 @@
   let hi;
   if (!hih) {
     hi = document.documentElement.clientHeight - 66;
-    mainObj.resize = () => {
+    openMap.get(id).resize = () => {
       hi = document.documentElement.clientHeight - 66;
     };
   } else hi = hih;
 
   let current = 0;
   let selectedColor = "LightGreen";
-  let grid;
   let search_input;
 
+  if (id)
+    openMap.get(id).activate = () => {
+      if (setTitle) setTitle(Descr, search_input);
+    };
+
   let updateTab = async () => {
+    /*
+    let url = `/FinderStart${IdDeclare}.json`;
+    const response = await fetch(url);
+    */
+
     let url = mainObj.baseUrl + "React/FinderStart";
     let bd = new FormData();
     bd.append("id", IdDeclare);
@@ -31,17 +41,21 @@
       method: "POST",
       body: bd,
     });
+
     const data = await response.json();
     mid = data;
     Descr = mid.Descr;
 
     load = false;
+    if (setTitle) setTitle(Descr, search_input);
+  };
+
+  onMount(() => {
+    updateTab();
+    //setTitle(Descr, search_input);
     //grid = document.body//document.getElementById('bodytab')
     //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
-    if (!setTitle) mainObj.setTitle(Descr, search_input);
-    else setTitle(Descr, search_input);
-  };
-  onMount(updateTab);
+  });
 
   let handleClick = (i) => {
     if (i == current) {

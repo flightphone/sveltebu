@@ -5,7 +5,7 @@
   //import { onMount } from 'svelte';
   import "./sidebar.css";
   let cnt = 0;
-  let Descr = "Table";
+  let Descr = "loading...";
   let userNav;
   mainObj.setTitle = (title, user_con) => {
     Descr = title;
@@ -13,8 +13,8 @@
     if (user_con) userNav.appendChild(user_con);
   };
 
-  function open(id, link1, params) {
-    mainObj.open(id, link1, params);
+  function open(id, link1, params, cash=true) {
+    mainObj.open(id, link1, params, cash);
   }
   function login() {
     navigate("/login");
@@ -37,13 +37,13 @@
     <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
       <!----------------------------------------------------------------------------------->
 
-      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
         <li>
           <a
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open(124, "Bureau.Finder", "132")}>Sales</a
+            on:click={() => open("124", "Bureau.Finder", "132")}>Sales</a
           >
         </li>
         <li>
@@ -51,7 +51,7 @@
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open(121, "Bureau.Finder", "129")}>Stores</a
+            on:click={() => open("121", "Bureau.Finder", "129", false)}>Stores</a
           >
         </li>
         <li>
@@ -59,7 +59,7 @@
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open(122, "Bureau.Finder", "130")}>Familys</a
+            on:click={() => open("122", "Bureau.Finder", "130")}>Familys</a
           >
         </li>
         <li>
@@ -67,7 +67,7 @@
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open(123, "Bureau.Finder", "131")}>Holidays</a
+            on:click={() => open("123", "Bureau.Finder", "131")}>Holidays</a
           >
         </li>
         <li class="mb-1">
@@ -86,7 +86,7 @@
                   href="#"
                   class="link-dark rounded"
                   data-bs-dismiss="offcanvas"
-                  on:click={() => open(19, "Bureau.Finder", "120")}>Account</a
+                  on:click={() => open("19", "Bureau.Finder", "120")}>Account</a
                 >
               </li>
               <li>
@@ -94,7 +94,7 @@
                   href="#"
                   class="link-dark rounded"
                   data-bs-dismiss="offcanvas"
-                  on:click={() => open(32, "Bureau.Finder", "121")}>Groups</a
+                  on:click={() => open("32", "Bureau.Finder", "121")}>Groups</a
                 >
               </li>
             </ul>
@@ -105,7 +105,7 @@
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open(2, "Bureau.Finder", "")}>Map of London</a
+            on:click={() => open("2", "", "", false)}>Map of London</a
           >
         </li>
       </ul>
