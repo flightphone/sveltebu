@@ -10,8 +10,17 @@
   let mid = {};
   let Descr = "loading...";
   let findval;
+  let filter_modal
+  let filter
+  let search_index = 0
+
+  let current = 0;
+  let selectedColor = "LightGreen";
+  let search_input;
 
   let hi;
+
+  //height table
   if (!hih) {
     hi = document.documentElement.clientHeight - 66;
     openMap.get(id).resize = () => {
@@ -19,15 +28,13 @@
     };
   } else hi = hih;
 
-  let current = 0;
-  let selectedColor = "LightGreen";
-  let search_input;
-
+  //active search and menu
   if (id)
     openMap.get(id).activate = () => {
       if (setTitle) setTitle(Descr, search_input);
     };
 
+  
   let updateTab = async (mode) => {
     /*
     let url = `/FinderStart${IdDeclare}.json`;
@@ -54,24 +61,25 @@
     });
     current = 0
     const data = await response.json();
-    mid = data;
     if (mode == 'new') //первоначальная загрузка
     {
+      mid = data;
+      //search index
+      mid.Fcols.map((column, index)=>{
+        if (column.FieldName == mid.DispField)
+          search_index = index
+      })
       Descr = mid.Descr;
       load = false;
       if (setTitle) setTitle(Descr, search_input);
     }
-    
-    
+    else
+    {
+      mid.MainTab = data.MainTab
+    }
   };
 
-  onMount(() => {
-    updateTab('new');
-    //setTitle(Descr, search_input);
-    //grid = document.body//document.getElementById('bodytab')
-    //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
-  });
-
+  //click on row table
   let handleClick = (i) => {
     if (i == current) {
       //mainObj.message('a-a-a');
@@ -84,6 +92,9 @@
     current = i;
   };
 
+
+
+  /*
   let enterKeyDown = (event) => {
     if (event.code == "ArrowDown") {
       handleClick(current + 2);
@@ -104,12 +115,12 @@
       handleClick(mid.MainTab.length - 1);
     }
   };
+  */
   //document.body.addEventListener('keydown', enterKeyDown, false);
-  let find = (e) => {
-    mid.SearchCols[0].FindString = findval;
-    updateTab('data')
-  };
-
+  
+  
+  
+  //delete confirm
   let confirmDelete = function() {
       if (current == null) return;
       let rw = mid.MainTab[current];
@@ -120,19 +131,97 @@
         val = "Delete row '" + val + "'?"  
       mainObj.message(val);
   }
+  
+  let getIcon = function(column)
+    {
+      if (column.Sort == "ASC")
+          return "bi bi-sort-alpha-down"
+      
+      if (column.Sort == "DESC") 
+          return "bi bi-sort-alpha-up-alt"
+      
+         return "bi bi-arrow-down-up";
+    }
+  let sortChangeIndex = function(column, index)
+    {
+      if (column.Sort == "ASC")
+          column.Sort = "DESC"
+      else
+      if (column.Sort == "DESC")    
+        column.Sort = "Нет"
+      else
+        column.Sort = "ASC"
+
+      //this.sortChange (null, index)  
+      let rang = 0;
+      let columns = mid.Fcols;
+      columns.map((e, i) => {
+        if (e.Sort == "Нет")  
+          e.SortOrder = null;
+
+        if (i != index && e.SortOrder)
+          if (e.SortOrder > rang) rang = e.SortOrder;
+      });
+      columns[index].SortOrder = rang + 1;
+      mid.Fcols = mid.Fcols
+    }  
+
+  onMount(() => {
+    updateTab('new');
+    filter_modal = new bootstrap.Modal(filter, {
+      keyboard: true,
+    });
+    //setTitle(Descr, search_input);
+    //grid = document.body//document.getElementById('bodytab')
+    //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
+  });
+
 </script>
 
+<!--Filter Modal -->
+<div class="modal" bind:this={filter} tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Filter and Sort ({Descr})</h1>
+        <div class="btn-group">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" on:click={()=>updateTab('data')}>Update</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        {#if !load}
+        {#each mid.Fcols as column, index}
+        <div class="input-group mb-3">
+        <div class="form-floating">
+          <input type="text" class="form-control" id="{column.FieldName}"  bind:value={column.FindString}>
+          <label for="{column.FieldName}">{column.FieldCaption}</label>
+        </div>
+        <button type="button" class="btn btn-secondary input-group-text" on:click={()=>sortChangeIndex(column, index)}>
+          <i class="{getIcon(column)}"></i>
+        </button>
+        </div>  
+        
+        {/each}
+        {/if}
+      </div>
+    </div>
+  </div>
+</div>
+<!--Filter Modal -->
+
+<!--Search an menu-->
 <div hidden>
   <ul class="navbar-nav" bind:this={search_input}>
+  {#if !load}
   <ul class="navbar-nav">
   <input
-    
-    bind:value={findval}
+    bind:value={mid.Fcols[search_index].FindString}
     type="search"
     class="form-control"
     placeholder="Search..."
     aria-label="Search"
-    on:input={find}
+    on:input={()=>updateTab('data')}
   />
   </ul>
  <ul class="navbar-nav">
@@ -144,21 +233,20 @@
       <li><button class="dropdown-item" type="button">Add</button></li>
       <li><button class="dropdown-item" type="button">Edit</button></li>
       <li><button class="dropdown-item" type="button" on:click={confirmDelete}>Delete</button></li>
-      <li><button class="dropdown-item" type="button">Filter and sort</button></li>
+      <li><button class="dropdown-item" type="button" on:click={()=>filter_modal.show()}>Filter and sort</button></li>
       <li><button class="dropdown-item" type="button">Pages</button></li>
       <li><button class="dropdown-item" type="button">Refresh</button></li>
       <li><button class="dropdown-item" type="button">Save as CSV</button></li>
       <li><button class="dropdown-item" type="button">Detail</button></li>
       <li><button class="dropdown-item" type="button">Settings</button></li>
-      
-
-      
     </ul>
   </ul>  
+  {/if}
 </ul>
-
-  
 </div>
+<!--Search an menu-->
+
+<!--Body an Table-->
 <div class="overflow-auto" style="height:{hi}px">
   {#if !load}
     <table class="table table-sm" style="margin:0px">
