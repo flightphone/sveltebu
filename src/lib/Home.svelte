@@ -10,6 +10,7 @@
   let currentActive = "124";
   let userNav;
   let openIDs = [];
+  
 
   //set nav bsr
   let setTitle = (txt, user_con) => {
@@ -155,9 +156,11 @@
   {#if currentActive == "2"}
     <Mymap id="2" {setTitle} />
   {/if}
+  <!--
   {#if currentActive == "121"}
     <Finder id="121" IdDeclare="129" setTitle={setTitle}/>
   {/if}
+  -->
   <!--
   {#if currentActive == 124}
     <Finder IdDeclare="132" {setTitle} />

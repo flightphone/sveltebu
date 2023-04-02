@@ -28,7 +28,7 @@
       if (setTitle) setTitle(Descr, search_input);
     };
 
-  let updateTab = async () => {
+  let updateTab = async (mode) => {
     /*
     let url = `/FinderStart${IdDeclare}.json`;
     const response = await fetch(url);
@@ -36,22 +36,37 @@
 
     let url = mainObj.baseUrl + "React/FinderStart";
     let bd = new FormData();
+    if (mode == 'data')
+    {
+      bd.append("mode", "data");
+      bd.append("page", mid.page.toString());
+      let allcols = mid.Fcols.concat(mid.SearchCols)
+      bd.append("Fc", JSON.stringify(allcols)); //mid.Fcols
+      if (mid.SQLParams) 
+        bd.append("SQLParams", JSON.stringify(mid.SQLParams));
+      if (mid.TextParams)
+        bd.append("TextParams", JSON.stringify(mid.TextParams));
+    }
     bd.append("id", IdDeclare);
     const response = await fetch(url, {
       method: "POST",
       body: bd,
     });
-
+    current = 0
     const data = await response.json();
     mid = data;
-    Descr = mid.Descr;
-
-    load = false;
-    if (setTitle) setTitle(Descr, search_input);
+    if (mode == 'new') //первоначальная загрузка
+    {
+      Descr = mid.Descr;
+      load = false;
+      if (setTitle) setTitle(Descr, search_input);
+    }
+    
+    
   };
 
   onMount(() => {
-    updateTab();
+    updateTab('new');
     //setTitle(Descr, search_input);
     //grid = document.body//document.getElementById('bodytab')
     //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
@@ -91,7 +106,8 @@
   };
   //document.body.addEventListener('keydown', enterKeyDown, false);
   let find = (e) => {
-    Descr = mid.Descr + "_" + findval;
+    mid.SearchCols[0].FindString = findval;
+    updateTab('data')
   };
 </script>
 

@@ -51,7 +51,7 @@
             href="#"
             class="link-dark rounded"
             data-bs-dismiss="offcanvas"
-            on:click={() => open("121", "Bureau.Finder", "129", false)}>Stores</a
+            on:click={() => open("121", "Bureau.Finder", "129")}>Stores</a
           >
         </li>
         <li>
