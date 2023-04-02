@@ -2,6 +2,7 @@
   //https://bootstrap-4.ru/docs/5.3/components/buttons/
   //https://www.bootstrapdash.com/bootstrap-free-admin-templates
   import { onMount } from "svelte";
+  import { navigate } from "svelte-routing";
   import Bar from "./Bar.svelte";
   import Mymap from "./Mymap.svelte";
   import Finder from "./Finder.svelte";
@@ -10,8 +11,7 @@
   let currentActive = "124";
   let userNav;
   let openIDs = [];
-  let DescrMessage = 'Query';
-  
+  let DescrMessage = "Query";
 
   let myModal;
   //var modalid = 'staticBackdrop';
@@ -23,7 +23,6 @@
     mainObj.setTitle(txt, user_con);
   };
 
-  
   let setTitleMessage = (txt, user_con) => {
     DescrMessage = txt;
     userNav.innerHTML = "";
@@ -41,6 +40,8 @@
   };
 
   mainObj.open = (id, link1, params, cash = true) => {
+    if (link1 == "exit") navigate("/login");
+
     if (!openMap.get(id)) {
       let c = getForm(id, link1, params);
       let obj = {
@@ -50,8 +51,7 @@
         data: {},
       };
       openMap.set(id, obj);
-      if (cash)
-        openIDs.push(id);
+      if (cash) openIDs.push(id);
     } else if (openMap.get(id).activate) openMap.get(id).activate();
 
     currentActive = id;
@@ -75,14 +75,12 @@
         mainObj.current = hi;
         openIDs = openIDs;
         */
-       
+
         mainObj.open(hi);
       }
     },
     false
   );
-
-  
 
   onMount(() => {
     /*
@@ -93,7 +91,7 @@
       keyboard: true,
     });
     mainObj.message = (msg) => {
-      msgtext = msg
+      msgtext = msg;
       myModal.show();
     };
   });
@@ -164,7 +162,7 @@
       />
     </div>
   {/each}
-  
+
   {#if currentActive == "2"}
     <Mymap id="2" {setTitle} />
   {/if}
