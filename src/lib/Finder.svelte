@@ -74,7 +74,7 @@
 
   let handleClick = (i) => {
     if (i == current) {
-      mainObj.message();
+      //mainObj.message('a-a-a');
       return;
     }
 
@@ -109,11 +109,24 @@
     mid.SearchCols[0].FindString = findval;
     updateTab('data')
   };
+
+  let confirmDelete = function() {
+      if (current == null) return;
+      let rw = mid.MainTab[current];
+      let val = rw[mid.DispField];
+      if (val == null)
+        val = "Delete row?"
+      else
+        val = "Delete row '" + val + "'?"  
+      mainObj.message(val);
+  }
 </script>
 
 <div hidden>
+  <ul class="navbar-nav" bind:this={search_input}>
+  <ul class="navbar-nav">
   <input
-    bind:this={search_input}
+    
     bind:value={findval}
     type="search"
     class="form-control"
@@ -121,6 +134,30 @@
     aria-label="Search"
     on:input={find}
   />
+  </ul>
+ <ul class="navbar-nav">
+  <span class="btn-group">
+    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <i class="bi bi-menu-app"></i>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><button class="dropdown-item" type="button">Add</button></li>
+      <li><button class="dropdown-item" type="button">Edit</button></li>
+      <li><button class="dropdown-item" type="button" on:click={confirmDelete}>Delete</button></li>
+      <li><button class="dropdown-item" type="button">Filter and sort</button></li>
+      <li><button class="dropdown-item" type="button">Pages</button></li>
+      <li><button class="dropdown-item" type="button">Refresh</button></li>
+      <li><button class="dropdown-item" type="button">Save as CSV</button></li>
+      <li><button class="dropdown-item" type="button">Detail</button></li>
+      <li><button class="dropdown-item" type="button">Settings</button></li>
+      
+
+      
+    </ul>
+  </ul>  
+</ul>
+
+  
 </div>
 <div class="overflow-auto" style="height:{hi}px">
   {#if !load}

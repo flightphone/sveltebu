@@ -10,14 +10,20 @@
   let currentActive = "124";
   let userNav;
   let openIDs = [];
+  let DescrMessage = 'Query';
   
+
+  let myModal;
+  //var modalid = 'staticBackdrop';
+  let staticBackdrop;
+  let msgtext;
 
   //set nav bsr
   let setTitle = (txt, user_con) => {
     mainObj.setTitle(txt, user_con);
   };
 
-  let DescrMessage;
+  
   let setTitleMessage = (txt, user_con) => {
     DescrMessage = txt;
     userNav.innerHTML = "";
@@ -76,9 +82,7 @@
     false
   );
 
-  let myModal;
-  //var modalid = 'staticBackdrop';
-  let staticBackdrop;
+  
 
   onMount(() => {
     /*
@@ -89,7 +93,8 @@
       keyboard: true,
     });
     mainObj.message = (msg) => {
-      myModal.show(msg);
+      msgtext = msg
+      myModal.show();
     };
   });
 </script>
@@ -111,10 +116,12 @@
         <h1 class="modal-title fs-5" id="staticBackdropLabel">
           {DescrMessage}
         </h1>
+        <!--
         <form
           class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"
           bind:this={userNav}
         />
+        -->
         <button
           type="button"
           class="btn-close"
@@ -122,8 +129,13 @@
           aria-label="Закрыть"
         />
       </div>
+      <!--
       <div class="modal-body">
         <Finder IdDeclare="132" hih="300" setTitle={setTitleMessage} />
+      </div>
+      -->
+      <div class="modal-body">
+        {msgtext}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"

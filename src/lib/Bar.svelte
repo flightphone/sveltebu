@@ -35,8 +35,40 @@
   -->
   <div class="offcanvas-body">
     <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+      <!--
+      <ul class="navbar-nav">
+        
+        <li class="nav-item dropdown dropdown-menu-end">
+          <a
+            class="nav-link dropdown-toggle d-flex"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <img
+              src="https://github.com/mdo.png"
+              alt=""
+              width="32"
+              height="32"
+              class="rounded-circle me-2"
+            />
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a class="dropdown-item" href="#">My profile</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="#">Settings</a>
+            </li>
+            <li>
+              <a class="dropdown-item" href="/login" use:link>Logout</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    -->
       <!----------------------------------------------------------------------------------->
-
       <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
         <li>
           <a
@@ -108,7 +140,22 @@
             on:click={() => open("2", "", "", false)}>Map of London</a
           >
         </li>
-      </ul>
+      </ul>  
+      <div class="dropdown border-top">
+        <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
+          <li>
+          <a class="link-dark rounded" 
+             data-bs-dismiss="offcanvas"
+             href="#" 
+             on:click={()=>navigate('/login')}
+             >Logout</a>
+          </li>   
+        </ul>     
+      </div>
+      
+      <!------------------------------------------------------------>
+
+      
     </div>
   </div>
 </div>
@@ -140,45 +187,14 @@
         <span class="navbar-toggler-icon" />
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <span class="fs-4">{Descr}</span>
         </ul>
-        <form
-          class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"
-          bind:this={userNav}
-        />
-
-        <ul class="navbar-nav dropstart">
-          <!-- Avatar  -->
-          <li class="nav-item dropdown">
-            <a
-              class="nav-link dropdown-toggle d-flex align-items-center"
-              href="#"
-              role="button"
-              data-bs-toggle="dropdown"
-              aria-expanded="false"
-            >
-              <img
-                src="https://github.com/mdo.png"
-                alt=""
-                width="32"
-                height="32"
-                class="rounded-circle me-2"
-              />
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <a class="dropdown-item" href="#">My profile</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">Settings</a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="/login" use:link>Logout</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
+        
+        <ul class="navbar-nav col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1" bind:this={userNav}>
+          </ul>
+        <!--class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"-->  
       </div>
     </div>
   </nav>
