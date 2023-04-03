@@ -8,7 +8,7 @@
   import Finder from "./Finder.svelte";
   import { mainObj, openMap } from "../store.js";
 
-  let currentActive = "124";
+  let currentActive;
   let userNav;
   let openIDs = [];
   let DescrMessage = "Query";
@@ -23,23 +23,16 @@
     mainObj.setTitle(txt, user_con);
   };
 
-  let setTitleMessage = (txt, user_con) => {
-    DescrMessage = txt;
-    userNav.innerHTML = "";
-    if (user_con) userNav.appendChild(user_con);
-  };
-
   let getForm = (id, link1, params) => {
     let control = id != 2 ? Finder : Mymap;
     let SQLParams = null;
     return {
       Conrol: control,
-      Params: params,
-      SQLParams: SQLParams,
+      Params: params
     };
   };
 
-  mainObj.open = (id, link1, params, cash = true) => {
+  mainObj.open = (id, link1, params, cash = true, TextParams = null, SQLParams = null, title = null) => {
     if (link1 == "exit") navigate("/login");
 
     if (!openMap.get(id)) {
@@ -47,7 +40,9 @@
       let obj = {
         Control: c.Conrol,
         Params: c.Params,
-        SQLParams: c.SQLParams,
+        SQLParams: SQLParams,
+        TextParams: TextParams,
+        title:  title, 
         data: {},
       };
       openMap.set(id, obj);
@@ -59,9 +54,11 @@
     openIDs = openIDs;
     //25.05.2022 история по якорям
     window.location.hash = id;
+
+    //DescrMessage = openIDs.length.toString()
   };
 
-  mainObj.open(currentActive, "", "132");
+  //mainObj.open(currentActive, "", "132");
 
   //история переходов
   window.addEventListener(
@@ -82,6 +79,32 @@
     false
   );
 
+  let alertConfirm;
+  let alertTitle;
+  let alertText;
+  let confirmAction;
+
+  mainObj.confirm = function (title, text, action) {
+    alertConfirm = true;
+    alertTitle = title;
+    alertText = text;
+    confirmAction = action;
+    myModal.show();
+  };
+  mainObj.alert =  function (title, text) {
+    alertConfirm = false;
+    alertTitle = title;
+    alertText = text;
+    confirmAction = ()=>{};
+    myModal.show();
+  }
+  /*
+    mainObj.message = (msg) => {
+      msgtext = msg;
+      myModal.show();
+    };
+  */
+
   onMount(() => {
     /*
 		myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
@@ -90,10 +113,6 @@
     myModal = new bootstrap.Modal(staticBackdrop, {
       keyboard: true,
     });
-    mainObj.message = (msg) => {
-      msgtext = msg;
-      myModal.show();
-    };
   });
 </script>
 
@@ -108,11 +127,11 @@
   aria-labelledby="staticBackdropLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="staticBackdropLabel">
-          {DescrMessage}
+          {alertTitle}
         </h1>
         <!--
         <form
@@ -124,7 +143,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Закрыть"
+          aria-label="Close"
         />
       </div>
       <!--
@@ -133,15 +152,24 @@
       </div>
       -->
       <div class="modal-body">
-        {msgtext}
+        {alertText}
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
-          >Ok</button
-        >
-        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
-          >Cancel</button
-        >
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+            on:click={confirmAction}>Ok</button
+          >
+          {#if alertConfirm}
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal">Cancel</button
+            >
+          {/if}
+        </div>
       </div>
     </div>
   </div>
@@ -169,24 +197,6 @@
   <!--
   {#if currentActive == "121"}
     <Finder id="121" IdDeclare="129" setTitle={setTitle}/>
-  {/if}
-  -->
-  <!--
-  {#if currentActive == 124}
-    <Finder IdDeclare="132" {setTitle} />
-  {/if}
-  
-  {#if currentActive == 122}
-    <Finder IdDeclare="130" />
-  {/if}
-  {#if currentActive == 123}
-    <Finder IdDeclare="131" />
-  {/if}
-  {#if currentActive == 19}
-    <Finder IdDeclare="120" />
-  {/if}
-  {#if currentActive == 32}
-    <Finder IdDeclare="121" />
   {/if}
   -->
 </div>

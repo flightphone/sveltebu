@@ -20,13 +20,15 @@
   let tree = [];
 
   let hi;
+  let height_bar = 66;
 
   let dateformat = (d, f) => mainObj.dateformat(d, f);
+
   //height table
-  if (!hih) {
-    hi = document.documentElement.clientHeight - 66;
+  if (!hih && id) {
+    hi = document.documentElement.clientHeight - height_bar;
     openMap.get(id).resize = () => {
-      hi = document.documentElement.clientHeight - 66;
+      hi = document.documentElement.clientHeight - height_bar;
     };
   } else hi = hih;
 
@@ -36,6 +38,7 @@
       if (setTitle) setTitle(Descr, search_input);
     };
 
+  //=====================================update tab=============================/
   let updateTab = async (mode) => {
     /*
     let url = `/FinderStart${IdDeclare}.json`;
@@ -44,6 +47,15 @@
 
     let url = mainObj.baseUrl + "React/FinderStart";
     let bd = new FormData();
+    let title;
+    if (mode == "new" && id) {
+      //check start parametrs
+      mid = openMap.get(id);
+      if (mid.SQLParams) bd.append("SQLParams", JSON.stringify(mid.SQLParams));
+      if (mid.TextParams)
+        bd.append("TextParams", JSON.stringify(mid.TextParams));
+      title = mid.title;
+    }
     if (mode == "data") {
       bd.append("mode", "data");
       bd.append("page", mid.page.toString());
@@ -60,6 +72,11 @@
     });
     current = 0;
     const data = await response.json();
+    if (data.Error) {
+      mainObj.alert("Error:", data.Error);
+      return;
+    }
+
     if (mode == "new") {
       //первоначальная загрузка
       mid = data;
@@ -68,12 +85,14 @@
         if (column.FieldName == mid.DispField) search_index = index;
       });
       Descr = mid.Descr;
+      if (title) Descr = Descr + " (" + title + ")";
       load = false;
       if (setTitle) setTitle(Descr, search_input);
     } else {
       mid.MainTab = data.MainTab;
     }
   };
+  //=====================================update tab=============================/
 
   //click on row table
   let handleClick = (i) => {
@@ -112,15 +131,56 @@
   */
   //document.body.addEventListener('keydown', enterKeyDown, false);
 
-  //delete confirm
+  //===============================delete row======================================/
   let confirmDelete = function () {
     if (current == null) return;
     let rw = mid.MainTab[current];
     let val = rw[mid.DispField];
     if (val == null) val = "Delete row?";
     else val = "Delete row '" + val + "'?";
-    mainObj.message(val);
+
+    mainObj.confirm(Descr, val, rowDelete);
   };
+  let rowDelete = async () => {
+    let SQLParams = {};
+    SQLParams[mid.KeyF] = mid.MainTab[current][mid.KeyF];
+    if (mid.DelProc.toLowerCase().indexOf("_del_1") > -1) {
+      SQLParams["AUDTUSER"] = mid.Account;
+    }
+
+    const url = mainObj.baseUrl + "React/exec";
+    let bd = new FormData();
+
+    bd.append("EditProc", mid.DelProc);
+    bd.append("SQLParams", JSON.stringify(SQLParams));
+    bd.append("KeyF", mid.KeyF);
+    bd.append("IdDeclare", IdDeclare);
+    bd.append("mode", "delete");
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: bd,
+    });
+
+    const res = await response.json();
+    if (res.message != "OK" && res.message != "Invalid storage type: DBNull.") {
+      mainObj.alert("Error:", res.message);
+      return;
+    }
+    updateTab("data");
+    //mid.MainTab.splice(mid.current, 1);
+    //mid = mid
+    //this.nupdate = this.nupdate + 1;
+    //Сигнал в слоты 22/05/2022
+    /*
+      if (openMap.get(this.id).updateTab != null)
+        openMap.get(this.id).updateTab()
+
+      //Обновляем все гриды в приложении 31.07.2022
+      mainObj.extupdate(mid.TableName, this.id);  	    
+      */
+  };
+  //===============================delete row======================================/
 
   let getIcon = function (column) {
     if (column.Sort == "ASC") return "bi bi-sort-alpha-down";
@@ -155,9 +215,43 @@
     //grid = document.body//document.getElementById('bodytab')
     //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
   });
+  let csv = function () {
+    const url = mainObj.baseUrl + "React/csv";
+    let bd = new FormData();
+    bd.append("id", IdDeclare);
+    bd.append("Fc", JSON.stringify(mid.Fcols));
+    if (mid.SQLParams) bd.append("SQLParams", JSON.stringify(mid.SQLParams));
+    if (mid.TextParams) bd.append("TextParams", JSON.stringify(mid.TextParams));
+
+    fetch(url, {
+      method: "POST",
+      body: bd,
+    })
+      .then((res) => res.blob())
+      .then((blob) => {
+        let a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.setAttribute("download", "data.csv");
+        a.click();
+      });
+  };
+
+  let openDetail = function () {
+    if (current == null) return;
+    let rw = mid.MainTab[current];
+    let val;
+    let par;
+    let TextParams = {};
+    val = rw[mid.KeyF];
+    TextParams[mid.KeyF] = val;
+    let params = mid.KeyValue;
+    let title = rw[mid.DispField];
+    let newid = id + "_" + rw[mid.KeyF];
+    mainObj.open(newid, "Bureau.Finder", params, true, TextParams, null, title);
+  };
 </script>
 
-<!--Filter Modal -->
+<!----------------------Filter Modal ----------------------------->
 <div
   class="modal"
   bind:this={filter}
@@ -210,9 +304,9 @@
     </div>
   </div>
 </div>
-<!--Filter Modal -->
+<!----------------------Filter Modal --------------------------------->
 
-<!--Search an menu-->
+<!--------------------------Search and menu--------------------------->
 <div hidden>
   <ul class="navbar-nav" bind:this={search_input}>
     {#if !load}
@@ -237,15 +331,23 @@
             <i class="bi bi-menu-app" />
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <li><button class="dropdown-item" type="button">Add</button></li>
-            <li><button class="dropdown-item" type="button">Edit</button></li>
-            <li>
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={confirmDelete}>Delete</button
-              >
-            </li>
+            {#if mid.DelProc}
+              <li><button class="dropdown-item" type="button">Add</button></li>
+            {/if}
+
+            {#if mid.EditProc}
+              <li><button class="dropdown-item" type="button">Edit</button></li>
+            {/if}
+
+            {#if mid.DelProc}
+              <li>
+                <button
+                  class="dropdown-item"
+                  type="button"
+                  on:click={confirmDelete}>Delete</button
+                >
+              </li>
+            {/if}
             <li>
               <button
                 class="dropdown-item"
@@ -255,22 +357,38 @@
             </li>
             <li><button class="dropdown-item" type="button">Pages</button></li>
             <li>
-              <button class="dropdown-item" type="button">Refresh</button>
+              <button
+                class="dropdown-item"
+                type="button"
+                on:click={() => updateTab("data")}>Refresh</button
+              >
             </li>
             <li>
-              <button class="dropdown-item" type="button">Save as CSV</button>
+              <button class="dropdown-item" type="button" on:click={csv}
+                >Save as CSV</button
+              >
             </li>
-            <li><button class="dropdown-item" type="button">Detail</button></li>
-            <li>
-              <button class="dropdown-item" type="button">Settings</button>
-            </li>
+            {#if mid.KeyValue}
+              <li>
+                <button
+                  class="dropdown-item"
+                  type="button"
+                  on:click={openDetail}>Detail</button
+                >
+              </li>
+            {/if}
+            {#if mid.IdDeclareSet}
+              <li>
+                <button class="dropdown-item" type="button">Settings</button>
+              </li>
+            {/if}
           </ul>
         </span>
       </ul>
     {/if}
   </ul>
 </div>
-<!--Search an menu-->
+<!--------------------------Search and menu--------------------------->
 
 <!--Body an Table-->
 <div class="overflow-auto" style="height:{hi}px">

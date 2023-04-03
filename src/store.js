@@ -1,9 +1,10 @@
 import { writable } from 'svelte/store';
 const prodaction = false;
+//const back_url = 'https://demovue.iefimmanievich.repl.co/'
+const back_url = 'http://127.0.0.1:5000/'
 let openMap = new Map();
 let mainObj = {
-  //baseUrl:  ((prodaction) ? '' : 'https://demovue.iefimmanievich.repl.co/'),
-  baseUrl:  ((prodaction) ? '' : 'http://127.0.0.1:5000/'),
+  baseUrl: ((prodaction) ? '' : back_url),
   resize: function () {
     openMap.forEach((value) => {
       if (value.resize) {
@@ -12,13 +13,13 @@ let mainObj = {
     });
   },
   dateformat: function (d, f) {
-    if (d==null)
+    if (d == null)
       return ""
     //if (!d) return d;
-    if (f=="text" || f == "hide" || f == 'password' || f== 'disabled' || f == null || f == "")
+    if (f == "text" || f == "hide" || f == 'password' || f == 'disabled' || f == null || f == "")
       return d;
 
-    if (d.length < 19) {
+    if (d.length != 24) {
       let res = f.match(/0\.(0+)/);
 
       let n = 0;
@@ -30,12 +31,21 @@ let mainObj = {
       if (n > 0) return Number(d.toString()).toFixed(n);
       else return d;
     }
-    f = f.replace("yyyy", d.substr(0, 4));
-    f = f.replace("yy", d.substr(2, 2));
-    f = f.replace("MM", d.substr(5, 2));
-    f = f.replace("dd", d.substr(8, 2));
-    f = f.replace("HH", d.substr(11, 2));
-    f = f.replace("mm", d.substr(14, 2));
+    else {
+      try {
+        f = f.replace("yyyy", d.substr(0, 4));
+        f = f.replace("yy", d.substr(2, 2));
+        f = f.replace("MM", d.substr(5, 2));
+        f = f.replace("dd", d.substr(8, 2));
+        f = f.replace("HH", d.substr(11, 2));
+        f = f.replace("mm", d.substr(14, 2));
+      } catch (error) {
+        f = error.toString()
+        // Expected output: ReferenceError: nonExistentFunction is not defined
+        // (Note: the exact output may be browser-dependent)
+      }
+    }
+
     return f;
   }
 

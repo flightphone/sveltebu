@@ -15,6 +15,20 @@
     let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
     const resp = await fetch(treeurl);
     tree_data = await resp.json();
+    let n = tree_data.length
+    for (let i = 0; i < n; i++)
+    {
+      if (!tree_data[i].children)
+      {
+        let item = tree_data[i]
+        open(
+          item.id.toString(),
+          item.attributes.link1,
+          item.attributes.params.toString()
+        )
+        break
+      }
+    }
     load = false;
   });
 
@@ -27,9 +41,11 @@
   function open(id, link1, params, cash = true) {
     mainObj.open(id, link1, params, cash);
   }
+  /*
   function login() {
     navigate("/login");
   }
+  */
 </script>
 
 <!--Offcanvas-->
@@ -52,80 +68,7 @@
 
       <!----------------------------------------------------------------------------------->
 
-      <!--
-      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
-        <li>
-          <a
-            href="#"
-            class="link-dark rounded"
-            data-bs-dismiss="offcanvas"
-            on:click={() => open("124", "Bureau.Finder", "132")}>Sales</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            class="link-dark rounded"
-            data-bs-dismiss="offcanvas"
-            on:click={() => open("121", "Bureau.Finder", "129")}>Stores</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            class="link-dark rounded"
-            data-bs-dismiss="offcanvas"
-            on:click={() => open("122", "Bureau.Finder", "130")}>Familys</a
-          >
-        </li>
-        <li>
-          <a
-            href="#"
-            class="link-dark rounded"
-            data-bs-dismiss="offcanvas"
-            on:click={() => open("123", "Bureau.Finder", "131")}>Holidays</a
-          >
-        </li>
-        <li class="mb-1">
-          <button
-            class="btn btn-toggle align-items-center rounded collapsed"
-            data-bs-toggle="collapse"
-            data-bs-target="#d19_node"
-            aria-expanded="false"
-          >
-            Settings (Admin)
-          </button>
-          <div class="collapse" id="d19_node" style="margin-left:15px">
-            <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
-              <li>
-                <a
-                  href="#"
-                  class="link-dark rounded"
-                  data-bs-dismiss="offcanvas"
-                  on:click={() => open("19", "Bureau.Finder", "120")}>Account</a
-                >
-              </li>
-              <li>
-                <a
-                  href="#"
-                  class="link-dark rounded"
-                  data-bs-dismiss="offcanvas"
-                  on:click={() => open("32", "Bureau.Finder", "121")}>Groups</a
-                >
-              </li>
-            </ul>
-          </div>
-        </li>
-        <li>
-          <a
-            href="#"
-            class="link-dark rounded"
-            data-bs-dismiss="offcanvas"
-            on:click={() => open("2", "", "", false)}>Map of London</a
-          >
-        </li>
-      </ul>  
-      -->
+      
 
       <div class="dropdown border-top">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
