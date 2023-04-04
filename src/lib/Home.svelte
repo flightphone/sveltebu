@@ -28,11 +28,19 @@
     let SQLParams = null;
     return {
       Conrol: control,
-      Params: params
+      Params: params,
     };
   };
 
-  mainObj.open = (id, link1, params, cash = true, TextParams = null, SQLParams = null, title = null) => {
+  mainObj.open = (
+    id,
+    link1,
+    params,
+    cash = true,
+    TextParams = null,
+    SQLParams = null,
+    title = null
+  ) => {
     if (link1 == "exit") navigate("/login");
 
     if (!openMap.get(id)) {
@@ -42,7 +50,7 @@
         Params: c.Params,
         SQLParams: SQLParams,
         TextParams: TextParams,
-        title:  title, 
+        title: title,
         data: {},
       };
       openMap.set(id, obj);
@@ -91,13 +99,13 @@
     confirmAction = action;
     myModal.show();
   };
-  mainObj.alert =  function (title, text) {
+  mainObj.alert = function (title, text) {
     alertConfirm = false;
     alertTitle = title;
     alertText = text;
-    confirmAction = ()=>{};
+    confirmAction = () => {};
     myModal.show();
-  }
+  };
   /*
     mainObj.message = (msg) => {
       msgtext = msg;

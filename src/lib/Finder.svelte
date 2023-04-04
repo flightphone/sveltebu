@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { mainObj, openMap } from "../store.js";
+  import Editor from './Editor.svelte'
   export let IdDeclare;
   export let setTitle;
   export let hih;
@@ -21,6 +22,13 @@
   let search_input;
   let tree = [];
   let pages = [];
+  let mode = 'grid'
+  let editDisp = {
+    close: ()=>{
+      mode = 'grid'
+      if (setTitle) setTitle(Descr, search_input);
+    }
+  }
 
   let hi;
   let height_bar = 66;
@@ -38,7 +46,13 @@
   //active search and menu
   if (id)
     openMap.get(id).activate = () => {
-      if (setTitle) setTitle(Descr, search_input);
+      if (setTitle) 
+      {
+        if (mode=='grid')
+          setTitle(Descr, search_input);
+        else
+          editDisp.activate(mode)  
+      }
     };
 
   //=====================================update tab=============================/
@@ -274,6 +288,16 @@
     mid.page = pg;
     updateTab("data");
   };
+
+  let add = ()=>{
+    mode = 'add'
+    editDisp.activate(mode)
+  }
+
+  let edit = ()=>{
+    mode = 'edit'
+    editDisp.activate(mode)
+  }
 </script>
 
 <!--------------------Pages------------- aria-labelledby="offcanvasTopLabel" <h5 id="offcanvasTopLabel">Offcanvas top</h5>> -->
@@ -388,11 +412,11 @@
           </button>
           <ul class="dropdown-menu dropdown-menu-end">
             {#if mid.DelProc}
-              <li><button class="dropdown-item" type="button">Add</button></li>
+              <li><button class="dropdown-item" type="button" on:click={add}>Add</button></li>
             {/if}
 
             {#if mid.EditProc}
-              <li><button class="dropdown-item" type="button">Edit</button></li>
+              <li><button class="dropdown-item" type="button" on:click={edit}>Edit</button></li>
             {/if}
 
             {#if mid.DelProc}
@@ -453,7 +477,7 @@
 <!--------------------------Search and menu--------------------------->
 
 <!--Body  Table-->
-<div class="overflow-auto" style="height:{hi}px">
+<div class="overflow-auto" style="height:{hi}px" hidden={mode!='grid'}>
   {#if !load}
     <table class="table table-sm fs-6" style="margin:0px">
       <thead>
@@ -489,5 +513,11 @@
         {/each}
       </tbody>
     </table>
+  {/if}
+</div>
+<div class="container-fluid" hidden={!(mode == 'edit' || mode == 'add')}>
+  {#if !load}
+    <Editor setTitle={setTitle} editDisp = {editDisp} 
+    findData={mid}/>
   {/if}
 </div>
