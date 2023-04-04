@@ -13,11 +13,14 @@
   let filter_modal;
   let filter;
   let search_index = 0;
+  let offcanvasTop;
+  let offcanvasTop_modal;
 
   let current = 0;
   let selectedColor = "LightGreen";
   let search_input;
   let tree = [];
+  let pages = [];
 
   let hi;
   let height_bar = 66;
@@ -91,6 +94,11 @@
     } else {
       mid.MainTab = data.MainTab;
     }
+    //update pages list
+    let np = Math.min(mid.MaxPage, 10);
+    pages = [];
+    for (let i = 0; i < np; i++) pages.push(i + 1);
+    pages = pages;
   };
   //=====================================update tab=============================/
 
@@ -182,6 +190,7 @@
   };
   //===============================delete row======================================/
 
+  //=================================sort change=================================
   let getIcon = function (column) {
     if (column.Sort == "ASC") return "bi bi-sort-alpha-down";
 
@@ -205,16 +214,27 @@
     columns[index].SortOrder = rang + 1;
     mid.Fcols = mid.Fcols;
   };
+  //=================================sort change=================================/
 
+  //==================================on mount===================================
   onMount(() => {
     updateTab("new");
+
     filter_modal = new bootstrap.Modal(filter, {
       keyboard: true,
     });
+
+    offcanvasTop_modal = new bootstrap.Modal(offcanvasTop, {
+      keyboard: true,
+    });
+
     //setTitle(Descr, search_input);
     //grid = document.body//document.getElementById('bodytab')
     //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
   });
+
+  //==================================on mount===================================
+
   let csv = function () {
     const url = mainObj.baseUrl + "React/csv";
     let bd = new FormData();
@@ -249,7 +269,43 @@
     let newid = id + "_" + rw[mid.KeyF];
     mainObj.open(newid, "Bureau.Finder", params, true, TextParams, null, title);
   };
+
+  let onChangePage = (pg) => {
+    mid.page = pg;
+    updateTab("data");
+  };
 </script>
+
+<!--------------------Pages------------- aria-labelledby="offcanvasTopLabel" <h5 id="offcanvasTopLabel">Offcanvas top</h5>> -->
+<div class="modal modal-lg" tabindex="-1" bind:this={offcanvasTop}>
+  <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        {#if !load}
+          <nav aria-label="Page navigation example">
+            <ul class="pagination pagination-lg">
+             
+              {#each pages as e}
+                <li class={e != mid.page ? "page-item" : "page-item active"}>
+                  <a class="page-link" href="#" on:click={() => onChangePage(e)}
+                    >{e}</a
+                  >
+                </li>
+              {/each}
+              
+            </ul>
+          </nav>
+        {/if}
+        <button
+          type="button"
+          class="btn-close text-reset"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        />
+      </div>
+    </div>
+  </div>
+</div>
 
 <!----------------------Filter Modal ----------------------------->
 <div
@@ -355,7 +411,13 @@
                 on:click={() => filter_modal.show()}>Filter and sort</button
               >
             </li>
-            <li><button class="dropdown-item" type="button">Pages</button></li>
+            <li>
+              <button
+                class="dropdown-item"
+                type="button"
+                on:click={() => offcanvasTop_modal.show()}>Pages</button
+              >
+            </li>
             <li>
               <button
                 class="dropdown-item"
@@ -390,15 +452,17 @@
 </div>
 <!--------------------------Search and menu--------------------------->
 
-<!--Body an Table-->
+<!--Body  Table-->
 <div class="overflow-auto" style="height:{hi}px">
   {#if !load}
-    <table class="table table-sm" style="margin:0px">
+    <table class="table table-sm fs-6" style="margin:0px">
       <thead>
         <tr style="position: sticky;top: 0px" class="bg-info">
           {#each mid.Fcols as column}
             {#if column.DisplayFormat != "text" && column.DisplayFormat != "hide" && column.DisplayFormat != "password"}
-              <th scope="col">{column.FieldCaption}</th>
+              <th scope="col" class="align-middle text-center"
+                >{column.FieldCaption}</th
+              >
             {/if}
           {/each}
         </tr>

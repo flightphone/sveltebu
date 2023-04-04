@@ -21,7 +21,7 @@
 {:else}
   <li class="mb-1">
     <button
-      class="btn btn-toggle align-items-center rounded collapsed"
+      class="btn btn-toggle align-items-center rounded collapsed fs-5"
       data-bs-toggle="collapse"
       data-bs-target="#d{item.id}"
       aria-expanded="false"

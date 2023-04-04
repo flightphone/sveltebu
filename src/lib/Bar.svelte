@@ -61,7 +61,7 @@
   </div>
   -->
   <div class="offcanvas-body">
-    <div class="flex-shrink-0 p-3 bg-white" style="width: 280px;">
+    <div class="flex-shrink-0 p-3 bg-white" style="width: 380px;">
       {#if !load}
         <Tree items={tree_data} {open} />
       {/if}
@@ -125,7 +125,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <span class="fs-4">{Descr}</span>
+          <span class="fs-5">{Descr}</span>
         </ul>
 
         <ul
