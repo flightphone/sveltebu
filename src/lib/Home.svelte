@@ -124,8 +124,7 @@
   });
 </script>
 
-<!-- Модальное окно bind:this={modalid} -->
-<!--id = 'staticBackdrop'-->
+<!----------------- message window ------------>
 <div
   bind:this={staticBackdrop}
   class="modal"
@@ -141,12 +140,6 @@
         <h1 class="modal-title fs-5" id="staticBackdropLabel">
           {alertTitle}
         </h1>
-        <!--
-        <form
-          class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"
-          bind:this={userNav}
-        />
-        -->
         <button
           type="button"
           class="btn-close"
@@ -154,11 +147,6 @@
           aria-label="Close"
         />
       </div>
-      <!--
-      <div class="modal-body">
-        <Finder IdDeclare="132" hih="300" setTitle={setTitleMessage} />
-      </div>
-      -->
       <div class="modal-body">
         {alertText}
       </div>
@@ -184,7 +172,7 @@
 </div>
 
 <Bar />
-<div class="container-fluid" style="padding-top:65px;">
+<div class="container-fluid" style="padding-top:{mainObj.height_bar}px;">
   <!--<svelte:component this={Control} IdDeclare = {IdDeclare}/>-->
   <!--<Finder IdDeclare = {IdDeclare}/>-->
 

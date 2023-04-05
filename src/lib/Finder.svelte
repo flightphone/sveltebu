@@ -1,11 +1,15 @@
 <script>
   import { onMount } from "svelte";
   import { mainObj, openMap } from "../store.js";
-  import Editor from './Editor.svelte'
+  import Editor from "./Editor.svelte";
   export let IdDeclare;
   export let setTitle;
   export let hih;
   export let id;
+
+  //editors mode
+  export let editid;
+  export let findData;
 
   let load = true;
   let mid = {};
@@ -22,16 +26,21 @@
   let search_input;
   let tree = [];
   let pages = [];
-  let mode = 'grid'
+  let mode_edit = "grid";
   let editDisp = {
-    close: ()=>{
-      mode = 'grid'
+    close: () => {
+      mode_edit = "grid";
       if (setTitle) setTitle(Descr, search_input);
-    }
-  }
-
+    },
+  };
+  let setDisp = {
+    close: () => {
+      mode_edit = "grid";
+      if (setTitle) setTitle(Descr, search_input);
+    },
+  };
   let hi;
-  let height_bar = 66;
+  let height_bar = mainObj.height_bar + 5;
 
   let dateformat = (d, f) => mainObj.dateformat(d, f);
 
@@ -46,12 +55,11 @@
   //active search and menu
   if (id)
     openMap.get(id).activate = () => {
-      if (setTitle) 
-      {
-        if (mode=='grid')
-          setTitle(Descr, search_input);
-        else
-          editDisp.activate(mode)  
+      if (setTitle) {
+        if (mode_edit == "grid") setTitle(Descr, search_input);
+        if (mode_edit == "edit" || mode_edit == "add")
+          editDisp.activate(mode_edit);
+        if (mode_edit == "setting") setDisp.activate(mode_edit);
       }
     };
 
@@ -73,30 +81,40 @@
         bd.append("TextParams", JSON.stringify(mid.TextParams));
       title = mid.title;
     }
-    if (mode == "data") {
-      bd.append("mode", "data");
-      bd.append("page", mid.page.toString());
-      //let allcols = mid.Fcols.concat(mid.SearchCols)
-      bd.append("Fc", JSON.stringify(mid.Fcols)); //mid.Fcols
-      if (mid.SQLParams) bd.append("SQLParams", JSON.stringify(mid.SQLParams));
-      if (mid.TextParams)
-        bd.append("TextParams", JSON.stringify(mid.TextParams));
+
+    if (mode == "data" || (mode == "new" && editid == null)) {
+      if (mode == "data") {
+        bd.append("mode", "data");
+        bd.append("page", mid.page.toString());
+        //let allcols = mid.Fcols.concat(mid.SearchCols)
+        bd.append("Fc", JSON.stringify(mid.Fcols)); //mid.Fcols
+        if (mid.SQLParams)
+          bd.append("SQLParams", JSON.stringify(mid.SQLParams));
+        if (mid.TextParams)
+          bd.append("TextParams", JSON.stringify(mid.TextParams));
+      }
+
+      bd.append("id", IdDeclare);
+      const response = await fetch(url, {
+        method: "POST",
+        body: bd,
+      });
+
+      const data = await response.json();
+      if (data.Error) {
+        mainObj.alert("Error:", data.Error);
+        return;
+      }
+      if (mode == "new") mid = data;
+      else mid.MainTab = data.MainTab;
     }
-    bd.append("id", IdDeclare);
-    const response = await fetch(url, {
-      method: "POST",
-      body: bd,
-    });
-    current = 0;
-    const data = await response.json();
-    if (data.Error) {
-      mainObj.alert("Error:", data.Error);
-      return;
+    if (mode == "new" && editid != null) {
+      mid = findData;
     }
 
+    current = 0;
     if (mode == "new") {
       //первоначальная загрузка
-      mid = data;
       //search index
       mid.Fcols.map((column, index) => {
         if (column.FieldName == mid.DispField) search_index = index;
@@ -105,9 +123,8 @@
       if (title) Descr = Descr + " (" + title + ")";
       load = false;
       if (setTitle) setTitle(Descr, search_input);
-    } else {
-      mid.MainTab = data.MainTab;
     }
+
     //update pages list
     let np = Math.min(mid.MaxPage, 10);
     pages = [];
@@ -289,15 +306,18 @@
     updateTab("data");
   };
 
-  let add = ()=>{
-    mode = 'add'
-    editDisp.activate(mode)
-  }
+  let open = (m) => {
+    mode_edit = m;
 
-  let edit = ()=>{
-    mode = 'edit'
-    editDisp.activate(mode)
-  }
+    if (mode_edit == "edit" || mode_edit == "add") {
+      editDisp.activate(mode_edit);
+      editDisp.open();
+    }
+    if (mode_edit == "setting") {
+      setDisp.activate(mode_edit);
+      setDisp.open();
+    }
+  };
 </script>
 
 <!--------------------Pages------------- aria-labelledby="offcanvasTopLabel" <h5 id="offcanvasTopLabel">Offcanvas top</h5>> -->
@@ -308,7 +328,6 @@
         {#if !load}
           <nav aria-label="Page navigation example">
             <ul class="pagination pagination-lg">
-             
               {#each pages as e}
                 <li class={e != mid.page ? "page-item" : "page-item active"}>
                   <a class="page-link" href="#" on:click={() => onChangePage(e)}
@@ -316,7 +335,6 @@
                   >
                 </li>
               {/each}
-              
             </ul>
           </nav>
         {/if}
@@ -348,7 +366,7 @@
         <div class="btn-group">
           <button
             type="button"
-            class="btn btn-primary"
+            class="btn btn-secondary"
             data-bs-dismiss="modal"
             on:click={() => updateTab("data")}>Update</button
           >
@@ -390,7 +408,7 @@
 <div hidden>
   <ul class="navbar-nav" bind:this={search_input}>
     {#if !load}
-      <ul class="navbar-nav">
+      <div class="input-group">
         <input
           bind:value={mid.Fcols[search_index].FindString}
           type="search"
@@ -399,85 +417,98 @@
           aria-label="Search"
           on:input={() => updateTab("data")}
         />
-      </ul>
-      <ul class="navbar-nav">
-        <span class="btn-group">
-          <button
-            type="button"
-            class="btn btn-secondary dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <i class="bi bi-menu-app" />
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            {#if mid.DelProc}
-              <li><button class="dropdown-item" type="button" on:click={add}>Add</button></li>
-            {/if}
 
-            {#if mid.EditProc}
-              <li><button class="dropdown-item" type="button" on:click={edit}>Edit</button></li>
-            {/if}
+        <button
+          type="button"
+          class="btn btn-secondary dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          <i class="bi bi-menu-app" />
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end">
+          {#if mid.DelProc && editid == null}
+            <li>
+              <button
+                class="dropdown-item"
+                type="button"
+                on:click={() => open("add")}>Add</button
+              >
+            </li>
+          {/if}
 
-            {#if mid.DelProc}
-              <li>
-                <button
-                  class="dropdown-item"
-                  type="button"
-                  on:click={confirmDelete}>Delete</button
-                >
-              </li>
-            {/if}
+          {#if mid.EditProc && editid == null}
             <li>
               <button
                 class="dropdown-item"
                 type="button"
-                on:click={() => filter_modal.show()}>Filter and sort</button
+                on:click={() => open("edit")}>Edit</button
               >
             </li>
+          {/if}
+
+          {#if mid.DelProc && editid == null}
             <li>
               <button
                 class="dropdown-item"
                 type="button"
-                on:click={() => offcanvasTop_modal.show()}>Pages</button
+                on:click={confirmDelete}>Delete</button
               >
             </li>
+          {/if}
+          <li>
+            <button
+              class="dropdown-item"
+              type="button"
+              on:click={() => filter_modal.show()}>Filter and sort</button
+            >
+          </li>
+          <li>
+            <button
+              class="dropdown-item"
+              type="button"
+              on:click={() => offcanvasTop_modal.show()}>Pages</button
+            >
+          </li>
+          <li>
+            <button
+              class="dropdown-item"
+              type="button"
+              on:click={() => updateTab("data")}>Refresh</button
+            >
+          </li>
+          {#if editid == null}
+          <li>
+            <button class="dropdown-item" type="button" on:click={csv}
+              >Save as CSV</button
+            >
+          </li>
+          {/if}
+          {#if mid.KeyValue && editid == null}
+            <li>
+              <button class="dropdown-item" type="button" on:click={openDetail}
+                >Detail</button
+              >
+            </li>
+          {/if}
+          {#if mid.IdDeclareSet  && editid == null}
             <li>
               <button
                 class="dropdown-item"
                 type="button"
-                on:click={() => updateTab("data")}>Refresh</button
+                on:click={() => open("setting")}>Settings</button
               >
             </li>
-            <li>
-              <button class="dropdown-item" type="button" on:click={csv}
-                >Save as CSV</button
-              >
-            </li>
-            {#if mid.KeyValue}
-              <li>
-                <button
-                  class="dropdown-item"
-                  type="button"
-                  on:click={openDetail}>Detail</button
-                >
-              </li>
-            {/if}
-            {#if mid.IdDeclareSet}
-              <li>
-                <button class="dropdown-item" type="button">Settings</button>
-              </li>
-            {/if}
-          </ul>
-        </span>
-      </ul>
+          {/if}
+        </ul>
+      </div>
     {/if}
   </ul>
 </div>
 <!--------------------------Search and menu--------------------------->
 
 <!--Body  Table-->
-<div class="overflow-auto" style="height:{hi}px" hidden={mode!='grid'}>
+<div class="overflow-auto" style="height:{hi}px" hidden={mode_edit != "grid"}>
   {#if !load}
     <table class="table table-sm fs-6" style="margin:0px">
       <thead>
@@ -515,9 +546,20 @@
     </table>
   {/if}
 </div>
-<div class="container-fluid" hidden={!(mode == 'edit' || mode == 'add')}>
-  {#if !load}
-    <Editor setTitle={setTitle} editDisp = {editDisp} 
-    findData={mid}/>
-  {/if}
-</div>
+
+{#if editid == null}
+  <div
+    class="container-fluid"
+    hidden={!(mode_edit == "edit" || mode_edit == "add")}
+  >
+    {#if !load && mid.EditProc}
+      <Editor {setTitle} {editDisp} findData={mid} />
+    {/if}
+  </div>
+
+  <div class="container-fluid" hidden={!(mode_edit == "setting")}>
+    {#if !load && mid.IdDeclareSet}
+      <Editor {setTitle} editDisp={setDisp} findData={mid.Setting} />
+    {/if}
+  </div>
+{/if}

@@ -5,6 +5,7 @@ const back_url = 'http://127.0.0.1:5000/'
 let openMap = new Map();
 let mainObj = {
   baseUrl: ((prodaction) ? '' : back_url),
+  height_bar: 58,
   resize: function () {
     openMap.forEach((value) => {
       if (value.resize) {

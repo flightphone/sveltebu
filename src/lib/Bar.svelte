@@ -127,9 +127,14 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <span class="fs-5">{Descr}</span>
         </ul>
-
+        <!--
         <ul
           class="navbar-nav col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"
+          bind:this={userNav}
+        />
+        -->
+        <div
+          class="navbar-nav"
           bind:this={userNav}
         />
         <!--class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"-->
