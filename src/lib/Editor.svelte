@@ -26,6 +26,11 @@
         //mainObj.alert('setting', action)
     };
 
+    let selectFinder = (eid) => {
+        findData.ReferEdit.Editors[eid].window_modal.hide();
+        mainObj.alert("selectFinder", eid);
+    };
+
     onMount(() => {
         findData.ReferEdit.Editors.map((column) => {
             if (column.joinRow && column.joinRow.classname == "Bureau.Finder")
@@ -135,16 +140,12 @@
                         </h1>
 
                         <div class="btn-group">
-                            <!--
-                            <ul
-                        class="navbar-nav col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"
-                        bind:this={column.userNav}
-                        />-->
                             <div bind:this={column.userNav} />
                             <button
                                 type="button"
                                 class="btn btn-secondary"
-                                data-bs-dismiss="modal">Select</button
+                                on:click={() => selectFinder(index)}
+                                >Select</button
                             >
                             <button
                                 type="button"
@@ -161,6 +162,7 @@
                             editid={index}
                             setTitle={(title, user_con) =>
                                 column.userNav.appendChild(user_con)}
+                            {selectFinder}
                         />
                     </div>
                 </div>

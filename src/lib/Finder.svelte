@@ -10,6 +10,7 @@
   //editors mode
   export let editid;
   export let findData;
+  export let selectFinder;
 
   let load = true;
   let mid = {};
@@ -102,6 +103,7 @@
 
       const data = await response.json();
       if (data.Error) {
+        if (setTitle) setTitle(data.Error);
         mainObj.alert("Error:", data.Error);
         return;
       }
@@ -136,7 +138,10 @@
   //click on row table
   let handleClick = (i) => {
     if (i == current) {
-      //mainObj.message('a-a-a');
+      if (mid.EditProc && editid == null)
+        open('edit')
+      if (editid != null)  
+        selectFinder(editid)
       return;
     }
 
