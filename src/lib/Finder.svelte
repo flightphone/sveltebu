@@ -115,6 +115,7 @@
     }
 
     current = 0;
+    mid.curRow = 0
     if (mode == "new") {
       //первоначальная загрузка
       //search index
@@ -138,10 +139,8 @@
   //click on row table
   let handleClick = (i) => {
     if (i == current) {
-      if (mid.EditProc && editid == null)
-        open('edit')
-      if (editid != null)  
-        selectFinder(editid)
+      if (mid.EditProc && editid == null) open("edit");
+      if (editid != null) selectFinder(editid);
       return;
     }
 
@@ -149,6 +148,7 @@
     if (i < 0) i = 0;
     if (i >= maxr) i = maxr - 1;
     current = i;
+    mid.curRow = current;
   };
 
   /*
@@ -211,9 +211,10 @@
       mainObj.alert("Error:", res.message);
       return;
     }
-    updateTab("data");
-    //mid.MainTab.splice(mid.current, 1);
-    //mid = mid
+    //updateTab("data");
+    mid.MainTab.splice(current, 1);
+    mid.MainTab = mid.MainTab
+    
     //this.nupdate = this.nupdate + 1;
     //Сигнал в слоты 22/05/2022
     /*
@@ -264,9 +265,7 @@
       keyboard: true,
     });
 
-    //setTitle(Descr, search_input);
-    //grid = document.body//document.getElementById('bodytab')
-    //grid.addEventListener('keydown',(e) => {enterKeyDown(e)})
+    
   });
 
   //==================================on mount===================================
@@ -313,6 +312,7 @@
 
   let open = (m) => {
     mode_edit = m;
+    mid.curRow = current;
 
     if (mode_edit == "edit" || mode_edit == "add") {
       editDisp.activate(mode_edit);
@@ -322,6 +322,16 @@
       setDisp.activate(mode_edit);
       setDisp.open();
     }
+  };
+  let save = () => {
+    mid.MainTab = mid.MainTab
+  };
+  let saveSetting = () => {
+    let data = mid.Setting;
+    data.ReferEdit.SaveFieldList.map((f) => {
+      mid.SQLParams["@" + f] = data.MainTab[0][f];
+    });
+    updateTab('data');
   };
 </script>
 
@@ -483,11 +493,11 @@
             >
           </li>
           {#if editid == null}
-          <li>
-            <button class="dropdown-item" type="button" on:click={csv}
-              >Save as CSV</button
-            >
-          </li>
+            <li>
+              <button class="dropdown-item" type="button" on:click={csv}
+                >Save as CSV</button
+              >
+            </li>
           {/if}
           {#if mid.KeyValue && editid == null}
             <li>
@@ -496,7 +506,7 @@
               >
             </li>
           {/if}
-          {#if mid.IdDeclareSet  && editid == null}
+          {#if mid.IdDeclareSet && editid == null}
             <li>
               <button
                 class="dropdown-item"
@@ -551,20 +561,21 @@
     </table>
   {/if}
 </div>
-
+<!-----------------------------------Editor------------------------------>
 {#if editid == null}
   <div
     class="container-fluid"
     hidden={!(mode_edit == "edit" || mode_edit == "add")}
   >
     {#if !load && mid.EditProc}
-      <Editor {setTitle} {editDisp} findData={mid} />
+      <Editor {setTitle} {editDisp} findData={mid} save_fun={save} />
     {/if}
   </div>
 
   <div class="container-fluid" hidden={!(mode_edit == "setting")}>
     {#if !load && mid.IdDeclareSet}
-      <Editor {setTitle} editDisp={setDisp} findData={mid.Setting} />
+      <Editor {setTitle} editDisp={setDisp} findData={mid.Setting} save_fun={saveSetting}/>
     {/if}
   </div>
 {/if}
+<!-----------------------------------Editor------------------------------>

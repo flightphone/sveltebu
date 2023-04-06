@@ -6,29 +6,60 @@
     export let setTitle;
     export let editDisp;
     export let findData;
+    export let save_fun;
     let action;
     let ok_cancel;
-    let selectFilter;
-    let selectFilter_modal;
+    let WorkRow = {};
+    findData.ColumnTab.map((column) => {
+        WorkRow[column] = "";
+    });
+
     let save = () => {
-        //mainObj.alert('save', action)
+        let c = findData.curRow;
+        let row = findData.MainTab[c];
+        findData.ColumnTab.map((column) => {
+            row[column] = WorkRow[column];
+        });
         editDisp.close();
+        if (save_fun) save_fun();
     };
     let edit = () => {
-        //mainObj.alert('edit', action)
+        WorkRow = {};
+        let c = findData.curRow;
+        let row = findData.MainTab[c];
+        findData.ColumnTab.map((column) => {
+            WorkRow[column] = row[column] == null ? "" : row[column];
+        });
+        findData.Fcols.map((column) => {
+            if (column.DisplayFormat != "") {
+                WorkRow[column.FieldName] = mainObj.dateformat(
+                    WorkRow[column.FieldName],
+                    column.DisplayFormat
+                );
+            }
+        });
     };
 
     let add = () => {
-        //mainObj.alert('add', action)
+        WorkRow = {};
+        findData.ColumnTab.map((column) => {
+            WorkRow[column] = "";
+        });
     };
 
     let editSetting = () => {
-        //mainObj.alert('setting', action)
+        findData.curRow = 0;
+        edit();
     };
 
     let selectFinder = (eid) => {
         findData.ReferEdit.Editors[eid].window_modal.hide();
-        mainObj.alert("selectFinder", eid);
+        let column = findData.ReferEdit.Editors[eid];
+        let c = findData.ReferEdit.Editors[eid].joinRow.FindConrol.curRow;
+        let row = column.joinRow.FindConrol.MainTab[c];
+        for (let s in column.joinRow.fields) {
+            WorkRow[column.joinRow.fields[s]] = row[s];
+        }
     };
 
     onMount(() => {
@@ -38,11 +69,7 @@
                     keyboard: true,
                 });
         });
-        /*
-        selectFilter_modal = new bootstrap.Modal(selectFilter, {
-      keyboard: true,
-    });
-    */
+
         editDisp.activate = (mode) => {
             action = mode;
             setTitle(Descr(), ok_cancel);
@@ -76,7 +103,12 @@
     <div class="input-group mb-3">
         {#if !column.joinRow}
             <div class="form-floating">
-                <input type="text" class="form-control" id={column.FieldName} />
+                <input
+                    type="text"
+                    class="form-control"
+                    id={column.FieldName}
+                    bind:value={WorkRow[column.FieldName]}
+                />
                 <label for={column.FieldName}>{column.FieldCaption}</label>
             </div>
         {:else}
@@ -87,6 +119,7 @@
                             type="text"
                             class="form-control"
                             id={column.FieldName}
+                            bind:value={WorkRow[column.FieldName]}
                         />
                         <label for={column.FieldName}
                             >{column.FieldCaption}</label
@@ -109,6 +142,7 @@
                         items={column.joinRow.FindConrol.MainTab}
                         item_value={column.joinRow.keyField}
                         item_text={column.joinRow.FindConrol.DispField}
+                        field_value={WorkRow[column.joinRow.valField]}
                     />
 
                     <label for={column.FieldName}>{column.FieldCaption}</label>
