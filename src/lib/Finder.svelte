@@ -296,7 +296,7 @@
     let rw = mid.MainTab[current];
     let val;
     let par;
-    let TextParams = {};
+    let TextParams = {}; 
     val = rw[mid.KeyF];
     TextParams[mid.KeyF] = val;
     let params = mid.KeyValue;

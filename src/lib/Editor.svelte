@@ -1,7 +1,6 @@
 <script>
     import { onMount } from "svelte";
     import { mainObj } from "../store";
-    import Vselect from "./Vselect.svelte";
     import Finder from "./Finder.svelte";
     export let setTitle;
     export let editDisp;
@@ -13,16 +12,79 @@
     findData.ColumnTab.map((column) => {
         WorkRow[column] = "";
     });
+    findData.ReferEdit.Editors.map((column) => {
+        column.selected = {};
+    });
 
-    let save = () => {
+    let save = async () => {
         let c = findData.curRow;
         let row = findData.MainTab[c];
+
+        if (action == "setting") {
+            
+            findData.ColumnTab.map((column) => {
+                row[column] = WorkRow[column];
+            });
+
+            editDisp.close();
+            if (save_fun) save_fun();
+            return;
+        }
+
+        for (let f in findData.DefaultValues) {
+            WorkRow[f] = findData.DefaultValues[f];
+        }
+
+        for (let f in findData.TextParams) {
+            WorkRow[f] = findData.TextParams[f];
+        }
+        //save db
+        let SQLParams = {};
+        findData.ReferEdit.SaveFieldList.map((f) => {
+            SQLParams[f] = WorkRow[f];
+        });
+
+        const url = mainObj.baseUrl + "React/exec";
+        let bd = new FormData();
+
+        bd.append("EditProc", findData.EditProc);
+        bd.append("SQLParams", JSON.stringify(SQLParams));
+        bd.append("KeyF", findData.KeyF);
+        bd.append("IdDeclare", findData.IdDeclare);
+        bd.append("mode", "data");
+        const response = await fetch(url, {
+            method: "POST",
+            body: bd,
+        });
+
+        const res = await response.json();
+        if (res.message != "OK") {
+            mainObj.alert("Error:", res.message);
+            return;
+        }
+        if (res.ColumnTab.length == 1) {
+            WorkRow[findData.KeyF] = res.MainTab[0][res.ColumnTab[0]];
+        } else {
+            res.ColumnTab.map((column) => {
+                WorkRow[column] = res.MainTab[0][column];
+            });
+        }
+
+        //save db
+
+        if (action == "add") {
+            c = 0;
+            findData.MainTab.unshift({});
+            row = findData.MainTab[0]
+        }
         findData.ColumnTab.map((column) => {
             row[column] = WorkRow[column];
         });
+
         editDisp.close();
         if (save_fun) save_fun();
     };
+
     let edit = () => {
         WorkRow = {};
         let c = findData.curRow;
@@ -137,14 +199,19 @@
 
             {#if column.joinRow.classname == "Bureau.GridCombo"}
                 <div class="form-floating">
-                    <Vselect
+                    <select
                         id={column.FieldName}
-                        items={column.joinRow.FindConrol.MainTab}
-                        item_value={column.joinRow.keyField}
-                        item_text={column.joinRow.FindConrol.DispField}
-                        field_value={WorkRow[column.joinRow.valField]}
-                    />
-
+                        class="form-select"
+                        bind:value={WorkRow[column.joinRow.valField]}
+                    >
+                        {#each column.joinRow.FindConrol.MainTab as e}
+                            <option value={e[column.joinRow.keyField]}
+                                >{e[
+                                    column.joinRow.FindConrol.DispField
+                                ]}</option
+                            >
+                        {/each}
+                    </select>
                     <label for={column.FieldName}>{column.FieldCaption}</label>
                 </div>
             {/if}

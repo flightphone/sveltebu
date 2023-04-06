@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store';
 const prodaction = false;
-//const back_url = 'https://demovue.iefimmanievich.repl.co/'
-const back_url = 'http://127.0.0.1:5000/'
+const back_url = 'https://demovue.iefimmanievich.repl.co/'
+//const back_url = 'http://127.0.0.1:5000/'
 let openMap = new Map();
 let mainObj = {
   baseUrl: ((prodaction) ? '' : back_url),
