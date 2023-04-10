@@ -55,6 +55,8 @@
         const response = await fetch(url, {
             method: "POST",
             body: bd,
+            cache: "no-cache",
+            credentials: "include"
         });
 
         const res = await response.json();

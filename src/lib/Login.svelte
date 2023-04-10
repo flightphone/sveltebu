@@ -1,25 +1,51 @@
+<script>
+    import { mainObj } from "../store.js";
+    import { navigate } from "svelte-routing";
+    let UserName;
+    let Password;
+    let auth = async () => {
+        let url = mainObj.baseUrl + "Home/Login";
+        let bd = new FormData();
+        bd.append("UserName", UserName);
+        bd.append("Password", Password);
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: bd,
+                cache: "no-cache",
+                credentials: "include",
+            });
+        } catch (error) {}
+        navigate('/')
+    };
+</script>
+
 <main>
     <div class="row11">
         <div class="colm-logo">
             <h2>Login App</h2>
         </div>
-        <form action="/" method="GET">
-            <div class="colm-form">
-                <div class="form-container">
-                    <input type="text" placeholder="Login" />
-                    <input type="password" placeholder="Password" />
-                    <button class="btn-login">Enter</button>
-                    <!--
+        <!--<form action="/" method="GET">-->
+        <div class="colm-form">
+            <div class="form-container">
+                <input type="text" placeholder="Login" bind:value={UserName} />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    bind:value={Password}
+                />
+                <button class="btn-login" on:click={auth}>Enter</button>
+                <!--
 					<a href="#">Forgotten password?</a>
                     <button class="btn-new">Create new Account</button>
 					-->
-                </div>
-                <!--
+            </div>
+            <!--
 				<p><a href="#"><b>Create a Page</b></a> for a celebrity, brand or business.</p>
 				-->
-            </div>
-            <form />
-        </form>
+        </div>
+        <!--<form />-->
+        <!--</form>-->
     </div>
 </main>
 

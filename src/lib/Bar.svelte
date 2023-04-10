@@ -1,6 +1,5 @@
 <script>
   import { mainObj } from "../store.js";
-  import { navigate } from "svelte-routing";
   import Tree from "./Tree.svelte";
   import { onMount } from "svelte";
   import "./sidebar.css";
@@ -13,7 +12,10 @@
 
   onMount(async () => {
     let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
-    const resp = await fetch(treeurl);
+    const resp = await fetch(treeurl, {
+        cache: "no-cache",
+        credentials: "include"
+    });
     tree_data = await resp.json();
     let n = tree_data.length
     for (let i = 0; i < n; i++)

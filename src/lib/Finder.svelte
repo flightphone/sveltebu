@@ -99,6 +99,8 @@
       const response = await fetch(url, {
         method: "POST",
         body: bd,
+        cache: "no-cache",
+        credentials: "include",
       });
 
       const data = await response.json();
@@ -108,14 +110,18 @@
         return;
       }
       if (mode == "new") mid = data;
-      else mid.MainTab = data.MainTab;
+      else {
+        mid.MainTab = data.MainTab;
+        mid.MaxPage = data.MaxPage;
+        mid.TotalTab = data.TotalTab;
+      }
     }
     if (mode == "new" && editid != null) {
       mid = findData;
     }
 
     current = 0;
-    mid.curRow = 0
+    mid.curRow = 0;
     if (mode == "new") {
       //первоначальная загрузка
       //search index
@@ -129,7 +135,14 @@
     }
 
     //update pages list
-    let np = Math.min(mid.MaxPage, 10);
+    /*
+    let nr = parseInt(mid.TotalTab[0].n_total);
+    let md = nr % parseInt(mid.nrows);
+    let np = (nr - md) / parseInt(mid.nrows);
+    if (md > 0) np = np + 1;
+    np = Math.min(np, 12);
+    */
+    let np = Math.min(10, parseInt(mid.MaxPage));
     pages = [];
     for (let i = 0; i < np; i++) pages.push(i + 1);
     pages = pages;
@@ -204,6 +217,8 @@
     const response = await fetch(url, {
       method: "POST",
       body: bd,
+      cache: "no-cache",
+      credentials: "include",
     });
 
     const res = await response.json();
@@ -213,8 +228,8 @@
     }
     //updateTab("data");
     mid.MainTab.splice(current, 1);
-    mid.MainTab = mid.MainTab
-    
+    mid.MainTab = mid.MainTab;
+
     //this.nupdate = this.nupdate + 1;
     //Сигнал в слоты 22/05/2022
     /*
@@ -264,8 +279,6 @@
     offcanvasTop_modal = new bootstrap.Modal(offcanvasTop, {
       keyboard: true,
     });
-
-    
   });
 
   //==================================on mount===================================
@@ -296,7 +309,7 @@
     let rw = mid.MainTab[current];
     let val;
     let par;
-    let TextParams = {}; 
+    let TextParams = {};
     val = rw[mid.KeyF];
     TextParams[mid.KeyF] = val;
     let params = mid.KeyValue;
@@ -324,14 +337,14 @@
     }
   };
   let save = () => {
-    mid.MainTab = mid.MainTab
+    mid.MainTab = mid.MainTab;
   };
   let saveSetting = () => {
     let data = mid.Setting;
     data.ReferEdit.SaveFieldList.map((f) => {
       mid.SQLParams["@" + f] = data.MainTab[0][f];
     });
-    updateTab('data');
+    updateTab("data");
   };
 </script>
 
@@ -574,7 +587,12 @@
 
   <div class="container-fluid" hidden={!(mode_edit == "setting")}>
     {#if !load && mid.IdDeclareSet}
-      <Editor {setTitle} editDisp={setDisp} findData={mid.Setting} save_fun={saveSetting}/>
+      <Editor
+        {setTitle}
+        editDisp={setDisp}
+        findData={mid.Setting}
+        save_fun={saveSetting}
+      />
     {/if}
   </div>
 {/if}
