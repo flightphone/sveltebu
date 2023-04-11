@@ -1,6 +1,6 @@
 <script>
 	import "../../node_modules/leaflet/dist/leaflet.css";
-	import "../../node_modules/leaflet/dist/leaflet.js";
+	import {map, tileLayer} from "../../node_modules/leaflet/dist/leaflet-src.esm.js";
 	import { openMap } from "../store.js";
 	import { onMount } from "svelte";
 
@@ -18,16 +18,16 @@
 	let hi = document.documentElement.clientHeight - 80;
 	let show = function () {
 		hi = document.documentElement.clientHeight - 80;
-		const map = L.map("map").setView([51.505, -0.09], 12);
+		const mapp = map("map").setView([51.505, -0.09], 12);
 
-		const tiles = L.tileLayer(
+		const tiles = tileLayer(
 			"https://tile.openstreetmap.org/{z}/{x}/{y}.png",
 			{
 				maxZoom: 19,
 				attribution:
 					'&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
 			}
-		).addTo(map);
+		).addTo(mapp);
 	};
 
 	onMount(() => {

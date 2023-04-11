@@ -91,6 +91,15 @@
               on:click={() => open("2", "", "", false)}>Map of London</a
             >
           </li>
+          <li>
+            <a
+              href="https://github.com/flightphone/sveltebu"
+              class="link-dark rounded"
+              target="_blank"
+              >github.com</a
+            >
+          </li>
+          
         </ul>
       </div>
 

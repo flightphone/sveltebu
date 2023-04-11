@@ -2,6 +2,9 @@
     import { onMount } from "svelte";
     import { mainObj } from "../store";
     import Finder from "./Finder.svelte";
+    import {Modal} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
+    //import {Alert, Button, Carousel, Collapse, Dropdown, Modal, Offcanvas, Popover, ScrollSpy, Tab, Toast, Tooltip} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
+
     export let setTitle;
     export let editDisp;
     export let findData;
@@ -129,7 +132,7 @@
     onMount(() => {
         findData.ReferEdit.Editors.map((column) => {
             if (column.joinRow && column.joinRow.classname == "Bureau.Finder")
-                column.window_modal = new bootstrap.Modal(column.window, {
+                column.window_modal = new Modal(column.window, {
                     keyboard: true,
                 });
         });

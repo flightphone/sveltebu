@@ -1,6 +1,6 @@
 <script>
-  //https://bootstrap-4.ru/docs/5.3/components/buttons/
-  //https://www.bootstrapdash.com/bootstrap-free-admin-templates
+  //import {Alert, Button, Carousel, Collapse, Dropdown, Modal, Offcanvas, Popover, ScrollSpy, Tab, Toast, Tooltip} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
+  import {Modal} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
   import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import Bar from "./Bar.svelte";
@@ -114,11 +114,7 @@
   */
 
   onMount(() => {
-    /*
-		myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
-                  keyboard: false});
-    */
-    myModal = new bootstrap.Modal(staticBackdrop, {
+    myModal = new Modal(staticBackdrop, {
       keyboard: true,
     });
   });

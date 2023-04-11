@@ -1,4 +1,5 @@
 <script>
+  import {Modal} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
   import { onMount } from "svelte";
   import { mainObj, openMap } from "../store.js";
   import Editor from "./Editor.svelte";
@@ -272,11 +273,11 @@
   onMount(() => {
     updateTab("new");
 
-    filter_modal = new bootstrap.Modal(filter, {
+    filter_modal = new Modal(filter, {
       keyboard: true,
     });
 
-    offcanvasTop_modal = new bootstrap.Modal(offcanvasTop, {
+    offcanvasTop_modal = new Modal(offcanvasTop, {
       keyboard: true,
     });
   });
