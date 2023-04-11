@@ -3,7 +3,7 @@
   import Tree from "./Tree.svelte";
   import { onMount } from "svelte";
   import "./sidebar.css";
-  let cnt = 0;
+
   let Descr = "loading...";
   let userNav;
 
@@ -11,27 +11,29 @@
   let tree_data = [];
 
   onMount(async () => {
-    let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
-    const resp = await fetch(treeurl, {
+    try {
+      let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
+      const resp = await fetch(treeurl, {
         cache: "no-cache",
-        credentials: "include"
-    });
-    tree_data = await resp.json();
-    let n = tree_data.length
-    for (let i = 0; i < n; i++)
-    {
-      if (!tree_data[i].children)
-      {
-        let item = tree_data[i]
-        open(
-          item.id.toString(),
-          item.attributes.link1,
-          item.attributes.params.toString()
-        )
-        break
+        credentials: "include",
+      });
+      tree_data = await resp.json();
+      let n = tree_data.length;
+      for (let i = 0; i < n; i++) {
+        if (!tree_data[i].children) {
+          let item = tree_data[i];
+          open(
+            item.id.toString(),
+            item.attributes.link1,
+            item.attributes.params.toString()
+          );
+          break;
+        }
       }
+      load = false;
+    } catch (err) {
+      mainObj.login();
     }
-    load = false;
   });
 
   mainObj.setTitle = (title, user_con) => {
@@ -70,19 +72,17 @@
 
       <!----------------------------------------------------------------------------------->
 
-      
-
       <div class="dropdown border-top">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
-          <!--
           <li>
-          <a class="link-dark rounded" 
-             data-bs-dismiss="offcanvas"
-             href="#" 
-             on:click={()=>navigate('/login')}
-             >Logout</a>
-          </li>   
-        -->
+            <a
+              class="link-dark rounded"
+              data-bs-dismiss="offcanvas"
+              href="#"
+              on:click={mainObj.logout}>Exit</a
+            >
+          </li>
+
           <li>
             <a
               href="#"
@@ -95,11 +95,9 @@
             <a
               href="https://github.com/flightphone/sveltebu"
               class="link-dark rounded"
-              target="_blank"
-              >github.com</a
+              target="_blank">github.com</a
             >
           </li>
-          
         </ul>
       </div>
 
@@ -144,10 +142,7 @@
           bind:this={userNav}
         />
         -->
-        <div
-          class="navbar-nav"
-          bind:this={userNav}
-        />
+        <div class="navbar-nav" bind:this={userNav} />
         <!--class="col-6 col-lg-auto mb-1 mb-lg-2 me-lg-1"-->
       </div>
     </div>

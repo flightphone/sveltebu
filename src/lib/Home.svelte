@@ -1,6 +1,6 @@
 <script>
   //import {Alert, Button, Carousel, Collapse, Dropdown, Modal, Offcanvas, Popover, ScrollSpy, Tab, Toast, Tooltip} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
-  import {Modal} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
+  import { Modal } from "../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js";
   import { onMount } from "svelte";
   import { navigate } from "svelte-routing";
   import Bar from "./Bar.svelte";
@@ -41,7 +41,10 @@
     SQLParams = null,
     title = null
   ) => {
-    if (link1 == "exit") navigate("/login");
+    if (link1 == "exit") {
+      mainObj.logout();
+      return;
+    }
 
     if (!openMap.get(id)) {
       let c = getForm(id, link1, params);
@@ -62,11 +65,7 @@
     openIDs = openIDs;
     //25.05.2022 история по якорям
     window.location.hash = id;
-
-    //DescrMessage = openIDs.length.toString()
   };
-
-  //mainObj.open(currentActive, "", "132");
 
   //история переходов
   window.addEventListener(
@@ -74,13 +73,6 @@
     function () {
       let hi = window.location.hash.replace("#", "");
       if (hi != mainObj.current && openMap.get(hi)) {
-        /*
-        if (openMap.get(hi).activate) openMap.get(hi).activate();
-        currentActive = hi;
-        mainObj.current = hi;
-        openIDs = openIDs;
-        */
-
         mainObj.open(hi);
       }
     },
@@ -106,12 +98,6 @@
     confirmAction = () => {};
     myModal.show();
   };
-  /*
-    mainObj.message = (msg) => {
-      msgtext = msg;
-      myModal.show();
-    };
-  */
 
   onMount(() => {
     myModal = new Modal(staticBackdrop, {

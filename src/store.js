@@ -1,9 +1,24 @@
-import { writable } from 'svelte/store';
+import { navigate } from "svelte-routing";
 const prodaction = false;
 const back_url = 'https://demovue.iefimmanievich.repl.co/'
 //const back_url = 'http://127.0.0.1:5000/'
 let openMap = new Map();
 let mainObj = {
+  login: function () {
+    navigate('/login');
+  },
+  logout: async function () {
+    try {
+      let url = mainObj.baseUrl + "Home/logout";
+      const response = await fetch(url, {
+        method: "GET",
+        cache: "no-cache",
+        credentials: "include",
+      });
+      navigate('/login')
+    } catch (error) { }
+    navigate('/login')
+  },
   baseUrl: ((prodaction) ? '' : back_url),
   height_bar: 58,
   resize: function () {
