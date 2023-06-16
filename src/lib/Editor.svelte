@@ -2,7 +2,7 @@
     import { onMount } from "svelte";
     import { mainObj } from "../store";
     import Finder from "./Finder.svelte";
-    import {Modal} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
+    import { Modal } from "../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js";
     //import {Alert, Button, Carousel, Collapse, Dropdown, Modal, Offcanvas, Popover, ScrollSpy, Tab, Toast, Tooltip} from '../../node_modules/bootstrap/dist/js/bootstrap.esm.min.js'
 
     export let setTitle;
@@ -24,7 +24,6 @@
         let row = findData.MainTab[c];
 
         if (action == "setting") {
-            
             findData.ColumnTab.map((column) => {
                 row[column] = WorkRow[column];
             });
@@ -59,7 +58,7 @@
             method: "POST",
             body: bd,
             cache: "no-cache",
-            credentials: "include"
+            credentials: "include",
         });
 
         const res = await response.json();
@@ -80,7 +79,7 @@
         if (action == "add") {
             c = 0;
             findData.MainTab.unshift({});
-            row = findData.MainTab[0]
+            row = findData.MainTab[0];
         }
         findData.ColumnTab.map((column) => {
             row[column] = WorkRow[column];
@@ -237,7 +236,7 @@
         >
             <div class="modal-dialog modal-dialog-centered modal-xl">
                 <div class="modal-content">
-                    <div class="modal-header">
+                    <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center">
                         <h1
                             id="selectFilterModalLabel{index.toString()}"
                             class="modal-title fs-5"
@@ -245,19 +244,21 @@
                             {column.joinRow.FindConrol.Descr} (select)
                         </h1>
 
-                        <div class="btn-group">
+                        <div style="display:flex">
                             <div bind:this={column.userNav} />
-                            <button
-                                type="button"
-                                class="btn btn-secondary"
-                                on:click={() => selectFinder(index)}
-                                >Select</button
-                            >
-                            <button
-                                type="button"
-                                class="btn btn-primary"
-                                data-bs-dismiss="modal">Cancel</button
-                            >
+                            <div class="btn-group">
+                                <button
+                                    type="button"
+                                    class="btn btn-secondary"
+                                    on:click={() => selectFinder(index)}
+                                    >Select</button
+                                >
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    data-bs-dismiss="modal">Cancel</button
+                                >
+                            </div>
                         </div>
                     </div>
                     <div class="modal-body">

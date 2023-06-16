@@ -8,8 +8,9 @@
   <li>
     <a
       href="#"
-      class="link-dark rounded"
+      class="text-light rounded"
       data-bs-dismiss="offcanvas"
+      
       on:click={() =>
         open(
           item.id.toString(),
@@ -21,14 +22,15 @@
 {:else}
   <li class="mb-1">
     <button
-      class="btn btn-toggle align-items-center rounded collapsed fs-5"
+      style="margin-left:-5px; color:white"
+      class="btn btn-toggle align-items-center rounded collapsed fs-5 text-light"
       data-bs-toggle="collapse"
       data-bs-target="#d{item.id}"
       aria-expanded="false"
     >
       {item.text}
     </button>
-    <div class="collapse" id="d{item.id}" style="margin-left:15px">
+    <div class="collapse text-light" id="d{item.id}" style="margin-left:30px">
       <Tree items={item.children} {open} />
     </div>
   </li>{/if}

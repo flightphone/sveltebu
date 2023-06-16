@@ -154,7 +154,7 @@
 </div>
 
 <Bar />
-<div class="container-fluid" style="padding-top:{mainObj.height_bar}px;">
+<div class="container-fluid" style="padding-top:{mainObj.height_bar}px;padding-left:0px; padding-right:0px">
   <!--<svelte:component this={Control} IdDeclare = {IdDeclare}/>-->
   <!--<Finder IdDeclare = {IdDeclare}/>-->
 

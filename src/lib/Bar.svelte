@@ -64,14 +64,14 @@
     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Закрыть"></button>
   </div>
   -->
-  <div class="offcanvas-body">
-    <div class="flex-shrink-0 p-3 bg-white" style="width: 380px;">
+  <div class="offcanvas-body bg-primary" style="padding-top:30px; padding-left:0px; width:auto;">
+    <!-- <div class="bg-white"> -->
       {#if !load}
         <Tree items={tree_data} {open} />
       {/if}
 
       <!----------------------------------------------------------------------------------->
-
+<!--
       <div class="dropdown border-top">
         <ul class="btn-toggle-nav list-unstyled fw-normal pb-1">
           <li>
@@ -100,9 +100,9 @@
           </li>
         </ul>
       </div>
-
+-->
       <!------------------------------------------------------------>
-    </div>
+    <!-- </div> -->
   </div>
 </div>
 
@@ -119,7 +119,19 @@
         href="#offcanvasExample"
         aria-controls="offcanvasExample"
       >
-        <i class="bi-list" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          fill="currentColor"
+          class="bi bi-list"
+          viewBox="0 0 16 16"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
+          />
+        </svg>
       </a>
       <button
         class="navbar-toggler"
