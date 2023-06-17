@@ -12,7 +12,8 @@
 
   onMount(async () => {
     try {
-      let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
+      //let treeurl = mainObj.baseUrl + "ustore/gettree"; //'/gettree.json'
+      let treeurl = '/json/gettree.json'
       const resp = await fetch(treeurl, {
         cache: "no-cache",
         credentials: "include",

@@ -13,6 +13,7 @@
   export let findData;
   export let selectFinder;
 
+  
   let load = true;
   let mid = {};
   let Descr = "loading...";
@@ -97,12 +98,19 @@
       }
 
       bd.append("id", IdDeclare);
+
+      //load json in light version
+      url = `/json/FinderStart${IdDeclare}.json`;
+      const response = await fetch(url);
+
+      /*
       const response = await fetch(url, {
         method: "POST",
         body: bd,
         cache: "no-cache",
         credentials: "include",
       });
+      */
 
       const data = await response.json();
       if (data.Error) {
@@ -205,7 +213,8 @@
     if (mid.DelProc.toLowerCase().indexOf("_del_1") > -1) {
       SQLParams["AUDTUSER"] = mid.Account;
     }
-
+    //don't delete in light version
+    /*
     const url = mainObj.baseUrl + "React/exec";
     let bd = new FormData();
 
@@ -228,6 +237,7 @@
       return;
     }
     //updateTab("data");
+    */
     mid.MainTab.splice(current, 1);
     mid.MainTab = mid.MainTab;
 
@@ -283,6 +293,39 @@
   });
 
   //==================================on mount===================================
+  let pdf = async function () {
+    //const url = `/tex/print${IdDeclare}.tex`;
+    const url = `/tex/print75.tex`;
+    const response = await fetch(url);
+    let data = await response.text();
+    data = data.replaceAll("[iddeclare]", IdDeclare)
+    data = data.replaceAll("[descr]", Descr)
+    let form = document.getElementById("overleaf");
+    let texdata = document.getElementById("texdata");
+    texdata.value = data;
+    form.submit();
+    //alert('aa');
+    /*
+    let form = document.createElement("form");
+    form.action = "https://www.overleaf.com/docs";
+    form.method = "post";
+    form.target = "_blank"
+    let eng = document.createElement("input");
+    eng.type = "text"
+    eng.name = "engine"
+    eng.value = "xelatex"
+    let tex = document.createElement("textarea");
+    tex.name = "snip"
+    tex.value = data;
+    form.appendChild(eng);
+    form.appendChild(tex);
+    document.body.appendChild(form)
+    form.submit();
+    alert('aa');
+    */
+
+    
+  };
 
   let csv = function () {
     const url = mainObj.baseUrl + "React/csv";
@@ -348,6 +391,7 @@
     updateTab("data");
   };
 </script>
+
 
 <!--------------------Pages------------- aria-labelledby="offcanvasTopLabel" <h5 id="offcanvasTopLabel">Offcanvas top</h5>> -->
 <div class="modal modal-lg" tabindex="-1" bind:this={offcanvasTop}>
@@ -463,8 +507,8 @@
       {/if}
 
       {#if editid == null}
-        <button class="btn btn-secondary" type="button" on:click={csv}
-          >CSV</button
+        <button class="btn btn-secondary" type="button" on:click={pdf}
+          >PDF</button
         >
       {/if}
       {#if mid.KeyValue && editid == null}
@@ -520,94 +564,6 @@
           />
         </svg>
       </a>
-
-      <!--
-      <div class="input-group">
-        <button
-          type="button"
-          class="btn btn-secondary dropdown-toggle"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <i class="bi bi-menu-app" />
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end">
-          {#if mid.DelProc && editid == null}
-            <li>
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={() => open("add")}>Add</button
-              >
-            </li>
-          {/if}
-
-          {#if mid.EditProc && editid == null}
-            <li>
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={() => open("edit")}>Edit</button
-              >
-            </li>
-          {/if}
-
-          {#if mid.DelProc && editid == null}
-            <li>
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={confirmDelete}>Delete</button
-              >
-            </li>
-          {/if}
-          <li>
-            <button
-              class="dropdown-item"
-              type="button"
-              on:click={() => filter_modal.show()}>Filter and sort</button
-            >
-          </li>
-          <li>
-            <button
-              class="dropdown-item"
-              type="button"
-              on:click={() => offcanvasTop_modal.show()}>Pages</button
-            >
-          </li>
-          <li>
-            <button
-              class="dropdown-item"
-              type="button"
-              on:click={() => updateTab("data")}>Refresh</button
-            >
-          </li>
-          {#if editid == null}
-            <li>
-              <button class="dropdown-item" type="button" on:click={csv}
-                >Save as CSV</button
-              >
-            </li>
-          {/if}
-          {#if mid.KeyValue && editid == null}
-            <li>
-              <button class="dropdown-item" type="button" on:click={openDetail}
-                >Detail</button
-              >
-            </li>
-          {/if}
-          {#if mid.IdDeclareSet && editid == null}
-            <li>
-              <button
-                class="dropdown-item"
-                type="button"
-                on:click={() => open("setting")}>Settings</button
-              >
-            </li>
-          {/if}
-        </ul>
-      </div>
-      -->
     {/if}
   </div>
 </div>

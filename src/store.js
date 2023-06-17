@@ -1,5 +1,5 @@
 import { navigate } from "svelte-routing";
-const prodaction = false;
+const prodaction = true;
 //const back_url = 'https://demovue.iefimmanievich.repl.co/'
 const back_url = 'http://127.0.0.1:5000/'
 let openMap = new Map();

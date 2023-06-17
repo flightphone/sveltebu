@@ -45,7 +45,8 @@
         findData.ReferEdit.SaveFieldList.map((f) => {
             SQLParams[f] = WorkRow[f];
         });
-
+        //don't save in light version
+        /*
         const url = mainObj.baseUrl + "React/exec";
         let bd = new FormData();
 
@@ -73,7 +74,7 @@
                 WorkRow[column] = res.MainTab[0][column];
             });
         }
-
+        */
         //save db
 
         if (action == "add") {
@@ -263,6 +264,7 @@
                     </div>
                     <div class="modal-body">
                         <Finder
+                            id = ""
                             IdDeclare={column.joinRow.IdDeclare.toString()}
                             hih="450"
                             findData={column.joinRow.FindConrol}
