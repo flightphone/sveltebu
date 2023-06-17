@@ -294,17 +294,24 @@
 
   //==================================on mount===================================
   let pdf = async function () {
-    //const url = `/tex/print${IdDeclare}.tex`;
-    const url = `/tex/print75.tex`;
+    if (current == null) return;
+    
+    const url = `/tex/print${IdDeclare}.tex`;
+    //const url = `/tex/print75.tex`;
     const response = await fetch(url);
     let data = await response.text();
-    data = data.replaceAll("[iddeclare]", IdDeclare)
-    data = data.replaceAll("[descr]", Descr)
+    
+    let row = mid.MainTab[current];
+    mid.ColumnTab.map((column) => {
+            let val = row[column] == null ? "" : row[column];
+            data = data.replaceAll('[' + column + ']', val)
+        });
+
     let form = document.getElementById("overleaf");
     let texdata = document.getElementById("texdata");
     texdata.value = data;
     form.submit();
-    //alert('aa');
+    
     /*
     let form = document.createElement("form");
     form.action = "https://www.overleaf.com/docs";
